@@ -14,9 +14,13 @@ const supabase = (SUPABASE_URL && SUPABASE_KEY) ? createClient(SUPABASE_URL, SUP
 const DATA_DIR = path.join(process.cwd(), 'src', 'server', 'data');
 const DATA_FILE = path.join(DATA_DIR, 'db.json');
 
-// Ensure directories exist
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+// Ensure directories exist (safe try-catch for serverless environments)
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch (err) {
+  console.warn("[Local DB] Could not create local data directory (expected on serverless environments like Vercel):", err);
 }
 
 // Simple helper to hash password
