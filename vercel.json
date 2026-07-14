@@ -1,35 +1,17 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "server.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["dist/**", "public/**"]
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server.ts"
+      "source": "/api/(.*)",
+      "destination": "/api/index"
     },
     {
-      "src": "/uploads/(.*)",
-      "dest": "/public/uploads/$1"
+      "source": "/uploads/(.*)",
+      "destination": "/public/uploads/$1"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/dist/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dist/$1",
-      "continue": true
-    },
-    {
-      "src": "/(.*)",
-      "dest": "server.ts"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

@@ -1,8 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { apiRouter } from './src/server/routes.js';
-import { createServer as createViteServer } from 'vite';
+import { apiRouter } from './src/server/routes';
 
 // Polyfills for ESM __dirname in Node
 const __filename = fileURLToPath(import.meta.url);
@@ -23,7 +22,12 @@ app.use('/api', apiRouter);
 
 // Serve or mount Vite middleware depending on production flag and platform
 async function setupFrontend() {
-  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  if (process.env.VERCEL) {
+    // Vercel delivers static files natively via its global CDN, no need for Express to serve them!
+    return;
+  }
+  if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
