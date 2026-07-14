@@ -132,7 +132,11 @@ export default function Dashboard() {
         showToast(result.message || 'Credentials updated successfully!', 'success');
         
         if (adminEmailForm) {
-          localStorage.setItem('b2bfiy_email', adminEmailForm);
+          try {
+            localStorage.setItem('b2bfiy_email', adminEmailForm);
+          } catch (e) {
+            console.warn('[SafeStorage] Failed to write email to localStorage:', e);
+          }
         }
         
         setAdminPasswordForm('');

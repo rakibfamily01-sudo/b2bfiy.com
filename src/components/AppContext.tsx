@@ -1,5 +1,32 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DatabaseState, SiteSettings } from '../types';
+import { DEFAULT_STATE } from '../lib/defaultState';
+
+// Safe localStorage wrapper to prevent crashes inside sandboxed iframes
+const safeStorage = {
+  getItem(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.warn(`[SafeStorage] Failed to read ${key} from localStorage:`, e);
+      return null;
+    }
+  },
+  setItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn(`[SafeStorage] Failed to write ${key} to localStorage:`, e);
+    }
+  },
+  removeItem(key: string): void {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.warn(`[SafeStorage] Failed to remove ${key} from localStorage:`, e);
+    }
+  }
+};
 
 interface AppContextType {
   // Navigation & Routing
@@ -32,14 +59,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [routeParams, setRouteParams] = useState<Record<string, string>>({});
   
-  // Public/Admin data state
-  const [data, setData] = useState<Partial<DatabaseState> | null>(null);
+  // Public/Admin data state - Default to built-in high-fidelity DEFAULT_STATE to prevent empty rendering while loading or on API failures (e.g. cookie checking redirects)
+  const [data, setData] = useState<Partial<DatabaseState> | null>(DEFAULT_STATE);
   const [loading, setLoading] = useState(true);
 
   // Authentication states
-  const [token, setToken] = useState<string | null>(localStorage.getItem('b2bfiy_token'));
-  const [adminEmail, setAdminEmail] = useState<string | null>(localStorage.getItem('b2bfiy_email'));
+  const [token, setToken] = useState<string | null>(safeStorage.getItem('b2bfiy_token'));
+  const [adminEmail, setAdminEmail] = useState<string | null>(safeStorage.getItem('b2bfiy_email'));
   const [isAdminVerified, setIsAdminVerified] = useState(false);
+
 
   // Notifications
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
@@ -120,8 +148,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setIsAdminVerified(true);
         return true;
       } else {
-        localStorage.removeItem('b2bfiy_token');
-        localStorage.removeItem('b2bfiy_email');
+        safeStorage.removeItem('b2bfiy_token');
+        safeStorage.removeItem('b2bfiy_email');
         setToken(null);
         setAdminEmail(null);
         setIsAdminVerified(false);
@@ -145,8 +173,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Auth logins
   const login = (authToken: string, email: string) => {
-    localStorage.setItem('b2bfiy_token', authToken);
-    localStorage.setItem('b2bfiy_email', email);
+    safeStorage.setItem('b2bfiy_token', authToken);
+    safeStorage.setItem('b2bfiy_email', email);
     setToken(authToken);
     setAdminEmail(email);
     setIsAdminVerified(true);
@@ -167,8 +195,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.error(e);
     } finally {
-      localStorage.removeItem('b2bfiy_token');
-      localStorage.removeItem('b2bfiy_email');
+      safeStorage.removeItem('b2bfiy_token');
+      safeStorage.removeItem('b2bfiy_email');
       setToken(null);
       setAdminEmail(null);
       setIsAdminVerified(false);
