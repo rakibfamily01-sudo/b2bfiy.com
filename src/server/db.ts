@@ -765,38 +765,35 @@ class JSONDatabase {
   }
 
   // Save changes locally and sync all tables to Supabase in the background
-  public save(): void {
+  public async save(): Promise<void> {
     if (!this.state) return;
     
     // Always write locally for fast offline/local feedback
     this.saveLocal();
 
     if (this.isSupabaseEnabled) {
-      // Async fire-and-forget save to cloud for all tables
-      (async () => {
-        try {
-          console.log("[Supabase] Synchronizing all state updates to Cloud individual tables...");
-          const keys = Object.keys(SECTION_TABLES) as Array<keyof typeof SECTION_TABLES>;
-          
-          await Promise.all(
-            keys.map(async (key) => {
-              const table = SECTION_TABLES[key];
-              const sectionData = this.state![key];
-              const { error } = await supabase!
-                .from(table)
-                .upsert({ id: 1, data: sectionData, updated_at: new Date().toISOString() });
-              
-              if (error) {
-                console.error(`[Supabase] Sync write failed for table ${table}:`, error);
-              }
-            })
-          );
-          
-          console.log("[Supabase] Cloud individual tables sync successful!");
-        } catch (err) {
-          console.error("[Supabase] Cloud network failure during save:", err);
-        }
-      })();
+      try {
+        console.log("[Supabase] Synchronizing all state updates to Cloud individual tables...");
+        const keys = Object.keys(SECTION_TABLES) as Array<keyof typeof SECTION_TABLES>;
+        
+        await Promise.all(
+          keys.map(async (key) => {
+            const table = SECTION_TABLES[key];
+            const sectionData = this.state![key];
+            const { error } = await supabase!
+              .from(table)
+              .upsert({ id: 1, data: sectionData, updated_at: new Date().toISOString() });
+            
+            if (error) {
+              console.error(`[Supabase] Sync write failed for table ${table}:`, error);
+            }
+          })
+        );
+        
+        console.log("[Supabase] Cloud individual tables sync successful!");
+      } catch (err) {
+        console.error("[Supabase] Cloud network failure during save:", err);
+      }
     }
   }
 
@@ -809,7 +806,7 @@ class JSONDatabase {
   }
 
   // Update specific section and write only that single table to Supabase
-  public updateSection<K extends keyof DatabaseState>(key: K, data: DatabaseState[K]): void {
+  public async updateSection<K extends keyof DatabaseState>(key: K, data: DatabaseState[K]): Promise<void> {
     const currentState = this.getState();
     currentState[key] = data;
     
@@ -819,26 +816,23 @@ class JSONDatabase {
     if (this.isSupabaseEnabled) {
       const table = SECTION_TABLES[key as keyof typeof SECTION_TABLES];
       if (table) {
-        // Async fire-and-forget save of the single modified table to cloud
-        (async () => {
-          try {
-            console.log(`[Supabase] Synchronizing single table updates for ${table} to Cloud...`);
-            const { error } = await supabase!
-              .from(table)
-              .upsert({ id: 1, data: data, updated_at: new Date().toISOString() });
-            
-            if (error) {
-              console.error(`[Supabase] Sync write failed for ${table}:`, error);
-              this.lastCloudError = `Write failed for ${table}: ${error.message}`;
-            } else {
-              this.lastCloudError = null;
-              console.log(`[Supabase] Cloud sync successful for ${table}!`);
-            }
-          } catch (err) {
-            console.error(`[Supabase] Cloud network failure during save of ${table}:`, err);
-            this.lastCloudError = err instanceof Error ? err.message : String(err);
+        try {
+          console.log(`[Supabase] Synchronizing single table updates for ${table} to Cloud...`);
+          const { error } = await supabase!
+            .from(table)
+            .upsert({ id: 1, data: data, updated_at: new Date().toISOString() });
+          
+          if (error) {
+            console.error(`[Supabase] Sync write failed for ${table}:`, error);
+            this.lastCloudError = `Write failed for ${table}: ${error.message}`;
+          } else {
+            this.lastCloudError = null;
+            console.log(`[Supabase] Cloud sync successful for ${table}!`);
           }
-        })();
+        } catch (err) {
+          console.error(`[Supabase] Cloud network failure during save of ${table}:`, err);
+          this.lastCloudError = err instanceof Error ? err.message : String(err);
+        }
       }
     }
   }

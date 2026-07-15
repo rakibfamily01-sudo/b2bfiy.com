@@ -1,15 +1,34 @@
 import app from '../server';
 
 export default function handler(req: any, res: any) {
-  // Vercel rewrites requests starting with /api/ to /api/index.
-  // This changes req.url to /api/index, which prevents Express routing from working.
-  // We restore the original URL from Vercel's headers so Express can route it correctly.
-  const originalUrl = req.headers['x-original-url'] || 
-                      req.headers['x-vercel-matched-path'] || 
-                      req.headers['x-matched-path'] || 
-                      req.url;
+  // Try to extract original path from rewrite query parameter '_url'
+  let originalUrl = '';
   
-  if (originalUrl) {
+  if (req.url) {
+    const urlParts = req.url.split('?');
+    const queryPart = urlParts[1] || '';
+    
+    if (queryPart.includes('_url=')) {
+      const params = new URLSearchParams(queryPart);
+      const urlParam = params.get('_url');
+      if (urlParam) {
+        params.delete('_url');
+        const remainingQuery = params.toString();
+        originalUrl = urlParam + (remainingQuery ? '?' + remainingQuery : '');
+      }
+    }
+  }
+  
+  // If we didn't find it via query param, try headers
+  if (!originalUrl) {
+    originalUrl = req.headers['x-forwarded-url'] || 
+                  req.headers['x-original-url'] || 
+                  req.headers['x-matched-path'] || 
+                  req.url;
+  }
+  
+  // Only override if the result is valid and not /api/index
+  if (originalUrl && originalUrl !== '/api/index') {
     req.url = originalUrl;
   }
   

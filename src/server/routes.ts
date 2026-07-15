@@ -121,7 +121,7 @@ apiRouter.get('/public/state', (req, res) => {
 });
 
 // Submit Free Digital Audit lead form
-apiRouter.post('/public/audit-request', (req, res) => {
+apiRouter.post('/public/audit-request', async (req, res) => {
   try {
     const { fullName, businessName, email, whatsapp, websiteUrl, serviceNeeded, message } = req.body;
     
@@ -146,7 +146,7 @@ apiRouter.post('/public/audit-request', (req, res) => {
 
     const state = dbInstance.getState();
     state.audit_requests.push(newRequest);
-    dbInstance.save();
+    await dbInstance.save();
 
     res.json({ success: true, id: newRequest.id, message: 'Your Free Digital Audit request has been submitted successfully!' });
   } catch (error) {
@@ -156,7 +156,7 @@ apiRouter.post('/public/audit-request', (req, res) => {
 });
 
 // Submit generic Contact Us lead form
-apiRouter.post('/public/contact', (req, res) => {
+apiRouter.post('/public/contact', async (req, res) => {
   try {
     const { fullName, email, subject, message } = req.body;
 
@@ -178,7 +178,7 @@ apiRouter.post('/public/contact', (req, res) => {
 
     const state = dbInstance.getState();
     state.contact_messages.push(newMessage);
-    dbInstance.save();
+    await dbInstance.save();
 
     res.json({ success: true, id: newMessage.id, message: 'Your message has been sent successfully! We will contact you soon.' });
   } catch (error) {
@@ -294,88 +294,88 @@ apiRouter.get('/admin/state', requireAdmin, (req, res) => {
 });
 
 // Update global site settings
-apiRouter.post(['/admin/settings', '/admin/save-settings'], requireAdmin, (req, res) => {
+apiRouter.post(['/admin/settings', '/admin/save-settings'], requireAdmin, async (req, res) => {
   const update = req.body.settings || req.body;
-  dbInstance.updateSection('settings', update);
+  await dbInstance.updateSection('settings', update);
   res.json({ success: true, data: update });
 });
 
 // Update navigation items
-apiRouter.post('/admin/navigation', requireAdmin, (req, res) => {
+apiRouter.post('/admin/navigation', requireAdmin, async (req, res) => {
   const items: NavigationItem[] = req.body;
-  dbInstance.updateSection('navigation_items', items);
+  await dbInstance.updateSection('navigation_items', items);
   res.json({ success: true, data: items });
 });
 
 // Update hero content section
-apiRouter.post(['/admin/hero', '/admin/save-hero-content'], requireAdmin, (req, res) => {
+apiRouter.post(['/admin/hero', '/admin/save-hero-content'], requireAdmin, async (req, res) => {
   const update = req.body.heroContent || req.body;
-  dbInstance.updateSection('hero_content', update);
+  await dbInstance.updateSection('hero_content', update);
   res.json({ success: true, data: update });
 });
 
 // Update counter stats
-apiRouter.post('/admin/statistics', requireAdmin, (req, res) => {
+apiRouter.post('/admin/statistics', requireAdmin, async (req, res) => {
   const items: StatisticCard[] = req.body;
-  dbInstance.updateSection('statistics', items);
+  await dbInstance.updateSection('statistics', items);
   res.json({ success: true, data: items });
 });
 
 // Update client logos
-apiRouter.post('/admin/client-logos', requireAdmin, (req, res) => {
+apiRouter.post('/admin/client-logos', requireAdmin, async (req, res) => {
   const items: ClientLogo[] = req.body;
-  dbInstance.updateSection('client_logos', items);
+  await dbInstance.updateSection('client_logos', items);
   res.json({ success: true, data: items });
 });
 
 // Update services cards list
-apiRouter.post(['/admin/services', '/admin/save-services'], requireAdmin, (req, res) => {
+apiRouter.post(['/admin/services', '/admin/save-services'], requireAdmin, async (req, res) => {
   const items = req.body.services || req.body;
-  dbInstance.updateSection('services', items);
+  await dbInstance.updateSection('services', items);
   res.json({ success: true, data: items });
 });
 
 // Update why choose us items list
-apiRouter.post('/admin/why-choose-us', requireAdmin, (req, res) => {
+apiRouter.post('/admin/why-choose-us', requireAdmin, async (req, res) => {
   const items: WhyChooseUsItem[] = req.body;
-  dbInstance.updateSection('why_choose_us', items);
+  await dbInstance.updateSection('why_choose_us', items);
   res.json({ success: true, data: items });
 });
 
 // Update work process step list
-apiRouter.post('/admin/work-process', requireAdmin, (req, res) => {
+apiRouter.post('/admin/work-process', requireAdmin, async (req, res) => {
   const items: WorkProcessStep[] = req.body;
-  dbInstance.updateSection('work_process', items);
+  await dbInstance.updateSection('work_process', items);
   res.json({ success: true, data: items });
 });
 
 // Update pricing plan packages
-apiRouter.post(['/admin/packages', '/admin/save-packages'], requireAdmin, (req, res) => {
+apiRouter.post(['/admin/packages', '/admin/save-packages'], requireAdmin, async (req, res) => {
   const items = req.body.packages || req.body;
-  dbInstance.updateSection('packages', items);
+  await dbInstance.updateSection('packages', items);
   res.json({ success: true, data: items });
 });
 
 // Delete a pricing plan package
-apiRouter.delete(['/admin/packages/:id', '/admin/delete-package/:id'], requireAdmin, (req, res) => {
+apiRouter.delete(['/admin/packages/:id', '/admin/delete-package/:id'], requireAdmin, async (req, res) => {
   const { id } = req.params;
   const state = dbInstance.getState();
   state.packages = state.packages.filter(p => p.id !== id);
-  dbInstance.save();
+  await dbInstance.save();
   res.json({ success: true, message: 'Pricing package deleted successfully' });
 });
 
 // Update testimonials
-apiRouter.post('/admin/testimonials', requireAdmin, (req, res) => {
+apiRouter.post('/admin/testimonials', requireAdmin, async (req, res) => {
   const items: Testimonial[] = req.body;
-  dbInstance.updateSection('testimonials', items);
+  await dbInstance.updateSection('testimonials', items);
   res.json({ success: true, data: items });
 });
 
 // Update FAQs list
-apiRouter.post('/admin/faqs', requireAdmin, (req, res) => {
+apiRouter.post('/admin/faqs', requireAdmin, async (req, res) => {
   const items: FAQItem[] = req.body;
-  dbInstance.updateSection('faqs', items);
+  await dbInstance.updateSection('faqs', items);
   res.json({ success: true, data: items });
 });
 
@@ -383,23 +383,23 @@ apiRouter.post('/admin/faqs', requireAdmin, (req, res) => {
 // PORTFOLIO CRUD ENDPOINTS
 // -------------------------------------------------------------------------
 
-apiRouter.post('/admin/portfolio-categories', requireAdmin, (req, res) => {
+apiRouter.post('/admin/portfolio-categories', requireAdmin, async (req, res) => {
   const categories: PortfolioCategory[] = req.body;
-  dbInstance.updateSection('portfolio_categories', categories);
+  await dbInstance.updateSection('portfolio_categories', categories);
   res.json({ success: true, data: categories });
 });
 
-apiRouter.post(['/admin/portfolio-projects', '/admin/save-portfolio-projects'], requireAdmin, (req, res) => {
+apiRouter.post(['/admin/portfolio-projects', '/admin/save-portfolio-projects'], requireAdmin, async (req, res) => {
   const items = req.body.projects || req.body;
-  dbInstance.updateSection('portfolio_projects', items);
+  await dbInstance.updateSection('portfolio_projects', items);
   res.json({ success: true, data: items });
 });
 
-apiRouter.delete(['/admin/portfolio-projects/:id', '/admin/delete-portfolio-project/:id'], requireAdmin, (req, res) => {
+apiRouter.delete(['/admin/portfolio-projects/:id', '/admin/delete-portfolio-project/:id'], requireAdmin, async (req, res) => {
   const { id } = req.params;
   const state = dbInstance.getState();
   state.portfolio_projects = state.portfolio_projects.filter(p => p.id !== id);
-  dbInstance.save();
+  await dbInstance.save();
   res.json({ success: true, message: 'Portfolio project deleted successfully' });
 });
 
@@ -408,7 +408,7 @@ apiRouter.delete(['/admin/portfolio-projects/:id', '/admin/delete-portfolio-proj
 // -------------------------------------------------------------------------
 
 // Update specific Free Audit Request
-apiRouter.put('/admin/audit-requests/:id', requireAdmin, (req, res) => {
+apiRouter.put('/admin/audit-requests/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { status, notes } = req.body;
   const state = dbInstance.getState();
@@ -422,12 +422,12 @@ apiRouter.put('/admin/audit-requests/:id', requireAdmin, (req, res) => {
   if (status !== undefined) state.audit_requests[index].status = status;
   if (notes !== undefined) state.audit_requests[index].notes = notes;
   
-  dbInstance.save();
+  await dbInstance.save();
   res.json({ success: true, data: state.audit_requests[index] });
 });
 
 // Delete specific Free Audit Request
-apiRouter.delete('/admin/audit-requests/:id', requireAdmin, (req, res) => {
+apiRouter.delete('/admin/audit-requests/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const state = dbInstance.getState();
   
@@ -439,12 +439,12 @@ apiRouter.delete('/admin/audit-requests/:id', requireAdmin, (req, res) => {
      return;
   }
   
-  dbInstance.save();
+  await dbInstance.save();
   res.json({ success: true, message: 'Audit request deleted successfully' });
 });
 
 // Update specific Contact Message
-apiRouter.put('/admin/contact-messages/:id', requireAdmin, (req, res) => {
+apiRouter.put('/admin/contact-messages/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { status, notes } = req.body;
   const state = dbInstance.getState();
@@ -458,12 +458,12 @@ apiRouter.put('/admin/contact-messages/:id', requireAdmin, (req, res) => {
   if (status !== undefined) state.contact_messages[index].status = status;
   if (notes !== undefined) state.contact_messages[index].notes = notes;
 
-  dbInstance.save();
+  await dbInstance.save();
   res.json({ success: true, data: state.contact_messages[index] });
 });
 
 // Delete specific Contact Message
-apiRouter.delete('/admin/contact-messages/:id', requireAdmin, (req, res) => {
+apiRouter.delete('/admin/contact-messages/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const state = dbInstance.getState();
 
@@ -475,12 +475,12 @@ apiRouter.delete('/admin/contact-messages/:id', requireAdmin, (req, res) => {
      return;
   }
 
-  dbInstance.save();
+  await dbInstance.save();
   res.json({ success: true, message: 'Contact message deleted successfully' });
 });
 
 // Generic Leads status and deletion mappings (for Dashboard.tsx compatibility)
-apiRouter.put('/admin/leads/:id/status', requireAdmin, (req, res) => {
+apiRouter.put('/admin/leads/:id/status', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -490,7 +490,7 @@ apiRouter.put('/admin/leads/:id/status', requireAdmin, (req, res) => {
       const idx = state.audit_requests.findIndex(r => r.id === id);
       if (idx !== -1) {
         state.audit_requests[idx].status = status;
-        dbInstance.save();
+        await dbInstance.save();
         res.json({ success: true, message: 'Audit request status updated' });
         return;
       }
@@ -498,7 +498,7 @@ apiRouter.put('/admin/leads/:id/status', requireAdmin, (req, res) => {
       const idx = state.contact_messages.findIndex(m => m.id === id);
       if (idx !== -1) {
         state.contact_messages[idx].status = status;
-        dbInstance.save();
+        await dbInstance.save();
         res.json({ success: true, message: 'Contact message status updated' });
         return;
       }
@@ -510,7 +510,7 @@ apiRouter.put('/admin/leads/:id/status', requireAdmin, (req, res) => {
   }
 });
 
-apiRouter.delete('/admin/leads/:id/delete', requireAdmin, (req, res) => {
+apiRouter.delete('/admin/leads/:id/delete', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const state = dbInstance.getState();
@@ -519,7 +519,7 @@ apiRouter.delete('/admin/leads/:id/delete', requireAdmin, (req, res) => {
       const initialLength = state.audit_requests.length;
       state.audit_requests = state.audit_requests.filter(r => r.id !== id);
       if (state.audit_requests.length < initialLength) {
-        dbInstance.save();
+        await dbInstance.save();
         res.json({ success: true, message: 'Audit request deleted' });
         return;
       }
@@ -527,7 +527,7 @@ apiRouter.delete('/admin/leads/:id/delete', requireAdmin, (req, res) => {
       const initialLength = state.contact_messages.length;
       state.contact_messages = state.contact_messages.filter(m => m.id !== id);
       if (state.contact_messages.length < initialLength) {
-        dbInstance.save();
+        await dbInstance.save();
         res.json({ success: true, message: 'Contact message deleted' });
         return;
       }
@@ -543,7 +543,7 @@ apiRouter.delete('/admin/leads/:id/delete', requireAdmin, (req, res) => {
 // MEDIA LIBRARY & BASE64 FILE UPLOAD
 // -------------------------------------------------------------------------
 
-apiRouter.post('/admin/media/upload', requireAdmin, (req, res) => {
+apiRouter.post('/admin/media/upload', requireAdmin, async (req, res) => {
   try {
     const { fileName, fileType, base64Data } = req.body;
 
@@ -584,7 +584,7 @@ apiRouter.post('/admin/media/upload', requireAdmin, (req, res) => {
 
     const state = dbInstance.getState();
     state.media.push(newMedia);
-    dbInstance.save();
+    await dbInstance.save();
 
     res.json({ success: true, data: newMedia });
   } catch (error) {
@@ -594,7 +594,7 @@ apiRouter.post('/admin/media/upload', requireAdmin, (req, res) => {
 });
 
 // Delete media item (by ID in URL or by filePath in body)
-apiRouter.delete('/admin/media/:id', requireAdmin, (req, res) => {
+apiRouter.delete('/admin/media/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const state = dbInstance.getState();
@@ -607,14 +607,14 @@ apiRouter.delete('/admin/media/:id', requireAdmin, (req, res) => {
 
     // Check if it is a local file
     if (mediaItem.fileUrl.startsWith('/uploads/')) {
-      const filePath = path.join(process.cwd(), 'public', mediaItem.fileUrl);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
+       const filePath = path.join(process.cwd(), 'public', mediaItem.fileUrl);
+       if (fs.existsSync(filePath)) {
+         fs.unlinkSync(filePath);
+       }
     }
 
     state.media = state.media.filter(m => m.id !== id);
-    dbInstance.save();
+    await dbInstance.save();
 
     res.json({ success: true, message: 'Media file deleted successfully' });
   } catch (error) {
@@ -624,7 +624,7 @@ apiRouter.delete('/admin/media/:id', requireAdmin, (req, res) => {
 });
 
 // Delete media item by filePath in body (flexible)
-apiRouter.delete('/admin/media', requireAdmin, (req, res) => {
+apiRouter.delete('/admin/media', requireAdmin, async (req, res) => {
   try {
     const { filePath } = req.body;
     if (!filePath) {
@@ -642,7 +642,7 @@ apiRouter.delete('/admin/media', requireAdmin, (req, res) => {
     }
 
     state.media = state.media.filter(m => m.fileUrl !== filePath);
-    dbInstance.save();
+    await dbInstance.save();
     res.json({ success: true, message: 'Media file deleted successfully' });
   } catch (error) {
     console.error("Media deletion failed", error);
@@ -651,7 +651,7 @@ apiRouter.delete('/admin/media', requireAdmin, (req, res) => {
 });
 
 // Register external media URL
-apiRouter.post('/admin/media-url', requireAdmin, (req, res) => {
+apiRouter.post('/admin/media-url', requireAdmin, async (req, res) => {
   try {
     const { url, name } = req.body;
     if (!url) {
@@ -668,7 +668,7 @@ apiRouter.post('/admin/media-url', requireAdmin, (req, res) => {
     };
     const state = dbInstance.getState();
     state.media.push(newMedia);
-    dbInstance.save();
+    await dbInstance.save();
     res.json({ success: true, data: newMedia });
   } catch (error) {
     console.error("Register media URL failed", error);
@@ -681,7 +681,7 @@ apiRouter.post('/admin/media-url', requireAdmin, (req, res) => {
 // -------------------------------------------------------------------------
 
 // Update Admin Profile (Credentials / Password)
-apiRouter.post('/admin/account', requireAdmin, (req, res) => {
+apiRouter.post('/admin/account', requireAdmin, async (req, res) => {
   try {
     const { email, password } = req.body;
     const state = dbInstance.getState();
@@ -697,7 +697,7 @@ apiRouter.post('/admin/account', requireAdmin, (req, res) => {
       state.admin.passwordHash = passwordHash;
     }
 
-    dbInstance.save();
+    await dbInstance.save();
     res.json({ success: true, email: state.admin.email, message: 'Admin credentials updated successfully' });
   } catch (error) {
     console.error("Account update failed", error);
