@@ -613,13 +613,26 @@ class JSONDatabase {
       return this.supabasePromise;
     }
 
-    this.supabasePromise = (async () => {
+    const loadTask = (async () => {
       try {
         console.log("[Supabase] Querying individual section tables from Cloud PostgreSQL...");
         const keys = Object.keys(SECTION_TABLES) as Array<keyof typeof SECTION_TABLES>;
         const loadedState: Partial<DatabaseState> = {};
-        let someTablesFailed = false;
+        const failedKeys: string[] = [];
         let lastErrorMsg = "";
+
+        const defaults = getInitialState();
+        let localState: DatabaseState;
+        try {
+          if (fs.existsSync(DATA_FILE)) {
+            const raw = fs.readFileSync(DATA_FILE, 'utf-8');
+            localState = JSON.parse(raw);
+          } else {
+            localState = defaults;
+          }
+        } catch (e) {
+          localState = defaults;
+        }
 
         // Query all tables in parallel to minimize latency
         await Promise.all(
@@ -634,35 +647,36 @@ class JSONDatabase {
 
               if (error) {
                 console.error(`[Supabase] Error loading table ${table}:`, error);
-                someTablesFailed = true;
+                failedKeys.push(key);
                 lastErrorMsg = error.message;
               } else if (data && data.data !== undefined) {
                 loadedState[key] = data.data as any;
+              } else {
+                console.log(`[Supabase] Table ${table} exists but has no id=1 record.`);
               }
             } catch (e: any) {
               console.error(`[Supabase] Exception loading table ${table}:`, e);
-              someTablesFailed = true;
+              failedKeys.push(key);
               lastErrorMsg = e.message || String(e);
             }
           })
         );
 
-        if (someTablesFailed) {
-          console.log("[Supabase] One or more section tables failed to load. Falling back to local db.json.");
-          this.lastCloudError = lastErrorMsg || "One or more tables are missing. Please run the setup SQL in your Supabase dashboard.";
-          this.state = this.loadLocal();
-        } else {
-          // Merge what was loaded with the default state to ensure fully populated state
-          const defaults = getInitialState();
-          this.state = {
-            ...defaults,
-            ...loadedState,
-          } as DatabaseState;
-          
-          this.lastCloudError = null;
-          this.sanitizeState();
-          console.log("[Supabase] Successfully synchronized individual tables from Cloud!");
+        // Merge what we successfully loaded with local and default state fallback
+        this.state = {
+          ...defaults,
+          ...localState,
+          ...loadedState,
+        } as DatabaseState;
 
+        this.sanitizeState();
+
+        if (failedKeys.length > 0) {
+          console.log(`[Supabase] ${failedKeys.length} section tables failed to load. Using local/default fallbacks for these:`, failedKeys);
+          this.lastCloudError = `Missing tables: ${failedKeys.join(', ')}. Please run the setup SQL in your Supabase dashboard or check connection.`;
+        } else {
+          this.lastCloudError = null;
+          console.log("[Supabase] Successfully synchronized all individual tables from Cloud!");
           // Proactively seed any tables that exist but are empty
           await this.seedMissingTables(keys);
         }
@@ -671,11 +685,26 @@ class JSONDatabase {
         console.error("[Supabase] Cloud connection failed. Using local storage.", err);
         this.lastCloudError = errMsg;
         this.state = this.loadLocal();
-      } finally {
-        this.supabasePromise = null;
       }
       return this.state!;
     })();
+
+    // 12 seconds timeout to allow slow cold starts
+    const timeoutTask = new Promise<DatabaseState>((_, reject) => {
+      setTimeout(() => reject(new Error("Supabase connection timed out after 12 seconds")), 12000);
+    });
+
+    this.supabasePromise = Promise.race([loadTask, timeoutTask])
+      .catch((err) => {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.error("[Supabase] Cloud load timed out or failed:", errMsg);
+        this.lastCloudError = errMsg;
+        this.state = this.loadLocal();
+        return this.state;
+      })
+      .finally(() => {
+        this.supabasePromise = null;
+      });
 
     return this.supabasePromise;
   }
