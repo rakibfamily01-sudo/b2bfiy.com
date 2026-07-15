@@ -69,7 +69,16 @@ export default function Login() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: trimmedEmail, password })
       });
-      const data = await res.json();
+      
+      const text = await res.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        console.error('Failed to parse response as JSON. Raw body:', text);
+        throw new Error(`Invalid response from server (non-JSON).`);
+      }
+
       if (res.ok && data.success) {
         login(data.token, data.email);
         showToast('Successfully logged in! Opening B2bfiy CMS...', 'success');
@@ -77,8 +86,9 @@ export default function Login() {
       } else {
         showToast(data.error || 'Invalid credentials. Please try again.', 'error');
       }
-    } catch (err) {
-      showToast('Backend offline or network error.', 'error');
+    } catch (err: any) {
+      console.error('Login system error:', err);
+      showToast(`Connection failed: ${err?.message || 'Please check your connection.'}`, 'error');
     } finally {
       setLoading(false);
     }
