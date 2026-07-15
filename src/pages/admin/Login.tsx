@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../components/AppContext';
-import { Lock, User, Eye, EyeOff, Sparkles, ArrowRight, Database, AlertTriangle, CheckCircle, Code, Copy, Check } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, Sparkles, ArrowRight, Database, AlertTriangle, CheckCircle, Code, Copy, Check, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface DBStatus {
   supabaseEnabled: boolean;
@@ -11,7 +12,7 @@ interface DBStatus {
 }
 
 export default function Login() {
-  const { login, showToast, navigateTo, isAdminVerified } = useApp();
+  const { login, showToast, navigateTo, isAdminVerified, toast } = useApp();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,6 +43,14 @@ export default function Login() {
       })
       .catch(err => {
         console.error('Failed to load database status:', err);
+        // Robust fallback so login page doesn't hang on "Loading diagnostics..."
+        setDbStatus({
+          supabaseEnabled: false,
+          lastCloudError: err instanceof Error ? err.message : String(err),
+          supabaseUrlConfigured: false,
+          supabaseKeyConfigured: false,
+          adminEmail: 'thedelusiongaming024@gmail.com'
+        });
       });
   }, []);
 
@@ -391,6 +400,32 @@ ALTER TABLE admin_profile DISABLE ROW LEVEL SECURITY;`;
           </div>
         )}
       </div>
+
+      {/* Floating System Notification Toast for Login Feedback */}
+      <AnimatePresence>
+        {toast.type && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-brand-pure-white rounded-2xl shadow-xl border border-brand-border p-4 flex items-start gap-3.5 text-left"
+          >
+            {toast.type === 'success' ? (
+              <CheckCircle className="w-6 h-6 text-green-600 shrink-0 mt-0.5" />
+            ) : (
+              <AlertCircle className="w-6 h-6 text-brand-primary shrink-0 mt-0.5" />
+            )}
+            <div className="flex-grow">
+              <h5 className="font-bold text-sm text-brand-dark">
+                {toast.type === 'success' ? 'Success' : 'Notification'}
+              </h5>
+              <p className="text-xs text-brand-secondary leading-relaxed mt-0.5">
+                {toast.message}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
