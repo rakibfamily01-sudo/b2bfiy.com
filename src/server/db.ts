@@ -646,7 +646,7 @@ class JSONDatabase {
                 .maybeSingle();
 
               if (error) {
-                console.error(`[Supabase] Error loading table ${table}:`, error);
+                console.log(`[Supabase] Note: Table ${table} not loaded from Cloud (will use local fallback):`, error.message);
                 failedKeys.push(key);
                 lastErrorMsg = error.message;
               } else if (data && data.data !== undefined) {
@@ -655,7 +655,7 @@ class JSONDatabase {
                 console.log(`[Supabase] Table ${table} exists but has no id=1 record.`);
               }
             } catch (e: any) {
-              console.error(`[Supabase] Exception loading table ${table}:`, e);
+              console.log(`[Supabase] Note: Exception loading table ${table} (will use local fallback):`, e?.message || String(e));
               failedKeys.push(key);
               lastErrorMsg = e.message || String(e);
             }
@@ -682,22 +682,22 @@ class JSONDatabase {
         }
       } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
-        console.error("[Supabase] Cloud connection failed. Using local storage.", err);
+        console.log("[Supabase] Cloud connection failed/timed out. Operating in secure local fallback mode.", errMsg);
         this.lastCloudError = errMsg;
         this.state = this.loadLocal();
       }
       return this.state!;
     })();
 
-    // 12 seconds timeout to allow slow cold starts
+    // 2.5 seconds timeout to allow fast fallback on slow connections
     const timeoutTask = new Promise<DatabaseState>((_, reject) => {
-      setTimeout(() => reject(new Error("Supabase connection timed out after 12 seconds")), 12000);
+      setTimeout(() => reject(new Error("Supabase connection timed out after 2.5 seconds")), 2500);
     });
 
     this.supabasePromise = Promise.race([loadTask, timeoutTask])
       .catch((err) => {
         const errMsg = err instanceof Error ? err.message : String(err);
-        console.error("[Supabase] Cloud load timed out or failed:", errMsg);
+        console.warn("[Supabase] Cloud load notice (operating in secure local fallback mode):", errMsg);
         this.lastCloudError = errMsg;
         this.state = this.loadLocal();
         return this.state;
@@ -754,6 +754,11 @@ class JSONDatabase {
     if (!this.state.audit_requests) this.state.audit_requests = [];
     if (!this.state.contact_messages) this.state.contact_messages = [];
     if (!this.state.media) this.state.media = [];
+    if (!this.state.admin || !this.state.admin.email || !this.state.admin.passwordHash) {
+      console.log("[Database Sanitize] Admin profile is missing or invalid. Re-seeding default admin credentials...");
+      const seeded = getInitialState();
+      this.state.admin = seeded.admin;
+    }
   }
 
   // Synchronous local file loader fallback
@@ -801,28 +806,31 @@ class JSONDatabase {
     this.saveLocal();
 
     if (this.isSupabaseEnabled) {
-      try {
-        console.log("[Supabase] Synchronizing all state updates to Cloud individual tables...");
-        const keys = Object.keys(SECTION_TABLES) as Array<keyof typeof SECTION_TABLES>;
-        
-        await Promise.all(
-          keys.map(async (key) => {
-            const table = SECTION_TABLES[key];
-            const sectionData = this.state![key];
-            const { error } = await supabase!
-              .from(table)
-              .upsert({ id: 1, data: sectionData, updated_at: new Date().toISOString() });
-            
-            if (error) {
-              console.error(`[Supabase] Sync write failed for table ${table}:`, error);
-            }
-          })
-        );
-        
-        console.log("[Supabase] Cloud individual tables sync successful!");
-      } catch (err) {
-        console.error("[Supabase] Cloud network failure during save:", err);
-      }
+      // Fire-and-forget background sync
+      (async () => {
+        try {
+          console.log("[Supabase Background Sync] Synchronizing all state updates to Cloud individual tables...");
+          const keys = Object.keys(SECTION_TABLES) as Array<keyof typeof SECTION_TABLES>;
+          
+          await Promise.all(
+            keys.map(async (key) => {
+              const table = SECTION_TABLES[key];
+              const sectionData = this.state![key];
+              const { error } = await supabase!
+                .from(table)
+                .upsert({ id: 1, data: sectionData, updated_at: new Date().toISOString() });
+              
+              if (error) {
+                console.error(`[Supabase Background Sync] Sync write failed for table ${table}:`, error);
+              }
+            })
+          );
+          
+          console.log("[Supabase Background Sync] Cloud individual tables sync successful!");
+        } catch (err) {
+          console.error("[Supabase Background Sync] Cloud network failure during save:", err);
+        }
+      })();
     }
   }
 
@@ -834,7 +842,7 @@ class JSONDatabase {
     return this.state!;
   }
 
-  // Update specific section and write only that single table to Supabase
+  // Update specific section and write only that single table to Supabase in the background
   public async updateSection<K extends keyof DatabaseState>(key: K, data: DatabaseState[K]): Promise<void> {
     const currentState = this.getState();
     currentState[key] = data;
@@ -845,23 +853,26 @@ class JSONDatabase {
     if (this.isSupabaseEnabled) {
       const table = SECTION_TABLES[key as keyof typeof SECTION_TABLES];
       if (table) {
-        try {
-          console.log(`[Supabase] Synchronizing single table updates for ${table} to Cloud...`);
-          const { error } = await supabase!
-            .from(table)
-            .upsert({ id: 1, data: data, updated_at: new Date().toISOString() });
-          
-          if (error) {
-            console.error(`[Supabase] Sync write failed for ${table}:`, error);
-            this.lastCloudError = `Write failed for ${table}: ${error.message}`;
-          } else {
-            this.lastCloudError = null;
-            console.log(`[Supabase] Cloud sync successful for ${table}!`);
+        // Fire-and-forget background sync
+        (async () => {
+          try {
+            console.log(`[Supabase Background Sync] Synchronizing single table updates for ${table} to Cloud...`);
+            const { error } = await supabase!
+              .from(table)
+              .upsert({ id: 1, data: data, updated_at: new Date().toISOString() });
+            
+            if (error) {
+              console.error(`[Supabase Background Sync] Sync write failed for ${table}:`, error);
+              this.lastCloudError = `Write failed for ${table}: ${error.message}`;
+            } else {
+              this.lastCloudError = null;
+              console.log(`[Supabase Background Sync] Cloud sync successful for ${table}!`);
+            }
+          } catch (err) {
+            console.error(`[Supabase Background Sync] Cloud network failure during save of ${table}:`, err);
+            this.lastCloudError = err instanceof Error ? err.message : String(err);
           }
-        } catch (err) {
-          console.error(`[Supabase] Cloud network failure during save of ${table}:`, err);
-          this.lastCloudError = err instanceof Error ? err.message : String(err);
-        }
+        })();
       }
     }
   }
