@@ -3,12 +3,19 @@ import { useApp } from '../../components/AppContext';
 import { Lock, User, Eye, EyeOff, Sparkles, ArrowRight } from 'lucide-react';
 
 export default function Login() {
-  const { login, showToast } = useApp();
+  const { login, showToast, navigateTo, isAdminVerified } = useApp();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Automatically redirect if already logged in
+  React.useEffect(() => {
+    if (isAdminVerified) {
+      navigateTo('/admin');
+    }
+  }, [isAdminVerified, navigateTo]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +35,7 @@ export default function Login() {
       if (res.ok && data.success) {
         login(data.token, data.email);
         showToast('Successfully logged in! Opening B2bfiy CMS...', 'success');
+        navigateTo('/admin');
       } else {
         showToast(data.error || 'Invalid credentials. Please try again.', 'error');
       }
