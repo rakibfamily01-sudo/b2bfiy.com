@@ -558,6 +558,26 @@ export function getInitialState(): DatabaseState {
   };
 }
 
+const SECTION_TABLES = {
+  settings: 'site_settings',
+  navigation_items: 'navigation_items',
+  hero_content: 'hero_content',
+  statistics: 'statistics',
+  client_logos: 'client_logos',
+  services: 'services',
+  why_choose_us: 'why_choose_us',
+  portfolio_categories: 'portfolio_categories',
+  portfolio_projects: 'portfolio_projects',
+  work_process: 'work_process',
+  packages: 'packages',
+  testimonials: 'testimonials',
+  faqs: 'faqs',
+  audit_requests: 'audit_requests',
+  contact_messages: 'contact_messages',
+  media: 'media',
+  admin: 'admin_profile',
+} as const;
+
 // Global DB class
 class JSONDatabase {
   private state: DatabaseState | null = null;
@@ -568,7 +588,7 @@ class JSONDatabase {
   constructor() {
     this.isSupabaseEnabled = !!supabase;
     if (this.isSupabaseEnabled) {
-      console.log("[Supabase] Detected Supabase credentials. Cloud Sync Mode is active!");
+      console.log("[Supabase] Detected Supabase credentials. Cloud Sync Mode is active with separate tables!");
     } else {
       console.log("[Local DB] No Supabase credentials detected. Running in Local JSON Mode.");
       this.load();
@@ -595,42 +615,56 @@ class JSONDatabase {
 
     this.supabasePromise = (async () => {
       try {
-        console.log("[Supabase] Querying application state from Cloud PostgreSQL...");
-        const { data, error } = await supabase!
-          .from('app_state')
-          .select('state')
-          .eq('id', 1)
-          .single();
+        console.log("[Supabase] Querying individual section tables from Cloud PostgreSQL...");
+        const keys = Object.keys(SECTION_TABLES) as Array<keyof typeof SECTION_TABLES>;
+        const loadedState: Partial<DatabaseState> = {};
+        let someTablesFailed = false;
+        let lastErrorMsg = "";
 
-        if (error) {
-          if (error.code === 'PGRST116') {
-            console.log("[Supabase] App state record not found. Seeding default state to Supabase...");
-            const initialState = getInitialState();
-            const { error: insertError } = await supabase!
-              .from('app_state')
-              .insert([{ id: 1, state: initialState }]);
-            
-            if (insertError) {
-              console.error("[Supabase] Failed to seed default state:", insertError);
-              this.lastCloudError = `Seed failed: ${insertError.message}`;
-            } else {
-              this.lastCloudError = null;
+        // Query all tables in parallel to minimize latency
+        await Promise.all(
+          keys.map(async (key) => {
+            const table = SECTION_TABLES[key];
+            try {
+              const { data, error } = await supabase!
+                .from(table)
+                .select('data')
+                .eq('id', 1)
+                .maybeSingle();
+
+              if (error) {
+                console.error(`[Supabase] Error loading table ${table}:`, error);
+                someTablesFailed = true;
+                lastErrorMsg = error.message;
+              } else if (data && data.data !== undefined) {
+                loadedState[key] = data.data as any;
+              }
+            } catch (e: any) {
+              console.error(`[Supabase] Exception loading table ${table}:`, e);
+              someTablesFailed = true;
+              lastErrorMsg = e.message || String(e);
             }
-            this.state = initialState;
-          } else {
-            console.error("[Supabase] Error retrieving state from cloud:", error);
-            this.lastCloudError = error.message;
-            this.state = this.loadLocal();
-          }
-        } else if (data && data.state) {
-          console.log("[Supabase] Successfully synchronized state from Cloud!");
-          this.state = data.state as DatabaseState;
+          })
+        );
+
+        if (someTablesFailed) {
+          console.log("[Supabase] One or more section tables failed to load. Falling back to local db.json.");
+          this.lastCloudError = lastErrorMsg || "One or more tables are missing. Please run the setup SQL in your Supabase dashboard.";
+          this.state = this.loadLocal();
+        } else {
+          // Merge what was loaded with the default state to ensure fully populated state
+          const defaults = getInitialState();
+          this.state = {
+            ...defaults,
+            ...loadedState,
+          } as DatabaseState;
+          
           this.lastCloudError = null;
           this.sanitizeState();
-        } else {
-          console.log("[Supabase] Empty payload received. Loading local fallback.");
-          this.lastCloudError = "Empty payload received from Supabase.";
-          this.state = this.loadLocal();
+          console.log("[Supabase] Successfully synchronized individual tables from Cloud!");
+
+          // Proactively seed any tables that exist but are empty
+          await this.seedMissingTables(keys);
         }
       } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
@@ -644,6 +678,32 @@ class JSONDatabase {
     })();
 
     return this.supabasePromise;
+  }
+
+  // Background seed check to populate newly created tables with default state if empty
+  private async seedMissingTables(keys: Array<keyof typeof SECTION_TABLES>): Promise<void> {
+    if (!this.state || !this.isSupabaseEnabled) return;
+    
+    for (const key of keys) {
+      const table = SECTION_TABLES[key];
+      try {
+        const { data, error } = await supabase!
+          .from(table)
+          .select('id')
+          .eq('id', 1)
+          .maybeSingle();
+        
+        if (!error && !data) {
+          console.log(`[Supabase] Seeding default values for newly initialized table ${table}...`);
+          const sectionData = this.state[key];
+          await supabase!
+            .from(table)
+            .insert([{ id: 1, data: sectionData }]);
+        }
+      } catch (err) {
+        console.error(`[Supabase] Background seed check failed for ${table}:`, err);
+      }
+    }
   }
 
   // Sanitize and guarantee default structures exist
@@ -704,7 +764,7 @@ class JSONDatabase {
     return this.loadLocal();
   }
 
-  // Save changes locally and sync to Supabase in the background
+  // Save changes locally and sync all tables to Supabase in the background
   public save(): void {
     if (!this.state) return;
     
@@ -712,19 +772,27 @@ class JSONDatabase {
     this.saveLocal();
 
     if (this.isSupabaseEnabled) {
-      // Async fire-and-forget save to cloud
+      // Async fire-and-forget save to cloud for all tables
       (async () => {
         try {
-          console.log("[Supabase] Synchronizing state updates to Cloud...");
-          const { error } = await supabase!
-            .from('app_state')
-            .upsert({ id: 1, state: this.state, updated_at: new Date().toISOString() });
+          console.log("[Supabase] Synchronizing all state updates to Cloud individual tables...");
+          const keys = Object.keys(SECTION_TABLES) as Array<keyof typeof SECTION_TABLES>;
           
-          if (error) {
-            console.error("[Supabase] Sync write failed:", error);
-          } else {
-            console.log("[Supabase] Cloud database sync successful!");
-          }
+          await Promise.all(
+            keys.map(async (key) => {
+              const table = SECTION_TABLES[key];
+              const sectionData = this.state![key];
+              const { error } = await supabase!
+                .from(table)
+                .upsert({ id: 1, data: sectionData, updated_at: new Date().toISOString() });
+              
+              if (error) {
+                console.error(`[Supabase] Sync write failed for table ${table}:`, error);
+              }
+            })
+          );
+          
+          console.log("[Supabase] Cloud individual tables sync successful!");
         } catch (err) {
           console.error("[Supabase] Cloud network failure during save:", err);
         }
@@ -740,11 +808,39 @@ class JSONDatabase {
     return this.state!;
   }
 
-  // Update specific section
+  // Update specific section and write only that single table to Supabase
   public updateSection<K extends keyof DatabaseState>(key: K, data: DatabaseState[K]): void {
     const currentState = this.getState();
     currentState[key] = data;
-    this.save();
+    
+    // Save locally
+    this.saveLocal();
+
+    if (this.isSupabaseEnabled) {
+      const table = SECTION_TABLES[key as keyof typeof SECTION_TABLES];
+      if (table) {
+        // Async fire-and-forget save of the single modified table to cloud
+        (async () => {
+          try {
+            console.log(`[Supabase] Synchronizing single table updates for ${table} to Cloud...`);
+            const { error } = await supabase!
+              .from(table)
+              .upsert({ id: 1, data: data, updated_at: new Date().toISOString() });
+            
+            if (error) {
+              console.error(`[Supabase] Sync write failed for ${table}:`, error);
+              this.lastCloudError = `Write failed for ${table}: ${error.message}`;
+            } else {
+              this.lastCloudError = null;
+              console.log(`[Supabase] Cloud sync successful for ${table}!`);
+            }
+          } catch (err) {
+            console.error(`[Supabase] Cloud network failure during save of ${table}:`, err);
+            this.lastCloudError = err instanceof Error ? err.message : String(err);
+          }
+        })();
+      }
+    }
   }
 }
 

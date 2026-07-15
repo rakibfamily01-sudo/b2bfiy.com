@@ -75,14 +75,144 @@ export default function Login() {
   };
 
   const sqlCommand = `-- Paste this SQL query into your Supabase SQL Editor:
-CREATE TABLE IF NOT EXISTS app_state (
+
+-- 1. site_settings
+CREATE TABLE IF NOT EXISTS site_settings (
   id BIGINT PRIMARY KEY,
-  state JSONB NOT NULL,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 2. navigation_items
+CREATE TABLE IF NOT EXISTS navigation_items (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 3. hero_content
+CREATE TABLE IF NOT EXISTS hero_content (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 4. statistics
+CREATE TABLE IF NOT EXISTS statistics (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 5. client_logos
+CREATE TABLE IF NOT EXISTS client_logos (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 6. services
+CREATE TABLE IF NOT EXISTS services (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 7. why_choose_us
+CREATE TABLE IF NOT EXISTS why_choose_us (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 8. portfolio_categories
+CREATE TABLE IF NOT EXISTS portfolio_categories (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 9. portfolio_projects
+CREATE TABLE IF NOT EXISTS portfolio_projects (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 10. work_process
+CREATE TABLE IF NOT EXISTS work_process (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 11. packages
+CREATE TABLE IF NOT EXISTS packages (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 12. testimonials
+CREATE TABLE IF NOT EXISTS testimonials (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 13. faqs
+CREATE TABLE IF NOT EXISTS faqs (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 14. audit_requests
+CREATE TABLE IF NOT EXISTS audit_requests (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 15. contact_messages
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 16. media
+CREATE TABLE IF NOT EXISTS media (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 17. admin_profile
+CREATE TABLE IF NOT EXISTS admin_profile (
+  id BIGINT PRIMARY KEY,
+  data JSONB NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- Disable Row Level Security (RLS) so our secure Vercel Express backend can read & write
-ALTER TABLE app_state DISABLE ROW LEVEL SECURITY;`;
+ALTER TABLE site_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE navigation_items DISABLE ROW LEVEL SECURITY;
+ALTER TABLE hero_content DISABLE ROW LEVEL SECURITY;
+ALTER TABLE statistics DISABLE ROW LEVEL SECURITY;
+ALTER TABLE client_logos DISABLE ROW LEVEL SECURITY;
+ALTER TABLE services DISABLE ROW LEVEL SECURITY;
+ALTER TABLE why_choose_us DISABLE ROW LEVEL SECURITY;
+ALTER TABLE portfolio_categories DISABLE ROW LEVEL SECURITY;
+ALTER TABLE portfolio_projects DISABLE ROW LEVEL SECURITY;
+ALTER TABLE work_process DISABLE ROW LEVEL SECURITY;
+ALTER TABLE packages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE testimonials DISABLE ROW LEVEL SECURITY;
+ALTER TABLE faqs DISABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_requests DISABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE media DISABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_profile DISABLE ROW LEVEL SECURITY;`;
 
   const copySqlToClipboard = () => {
     navigator.clipboard.writeText(sqlCommand);
