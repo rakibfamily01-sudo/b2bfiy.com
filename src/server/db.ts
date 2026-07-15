@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
+import { fileURLToPath } from 'url';
 import { DatabaseState, SiteSettings } from '../types';
 
 // Setup Supabase Client if env vars are present
@@ -9,6 +10,10 @@ const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
 const supabase = (SUPABASE_URL && SUPABASE_KEY) ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+// Resolve ES module path (compatible with Vercel bundling tracer)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Path to data file
 const DATA_DIR = path.join(process.cwd(), 'src', 'server', 'data');

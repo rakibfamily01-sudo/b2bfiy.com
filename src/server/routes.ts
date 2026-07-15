@@ -87,10 +87,14 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// Ensure local uploads directory exists
+// Ensure local uploads directory exists (safely for serverless environments)
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+} catch (err) {
+  console.warn("[Local Uploads] Could not create local uploads directory (expected on serverless environments like Vercel):", err);
 }
 
 // -------------------------------------------------------------------------
@@ -193,60 +197,66 @@ apiRouter.post('/public/contact', async (req, res) => {
 
 // Secure Login endpoint
 apiRouter.post('/auth/login', async (req, res) => {
-  const { email, password } = req.body;
-  const state = dbInstance.getState();
-
-  if (!email || !password) {
-     res.status(400).json({ error: 'Email and password are required' });
-     return;
-  }
-
-  const admin = state.admin || { email: 'thedelusiongaming024@gmail.com', salt: '', passwordHash: '' };
-  
-  // Check standard credentials
-  let calculatedHash = '';
-  if (admin.salt) {
-    calculatedHash = hashPassword(password, admin.salt);
-  }
-  
-  const isCorrectStandard = admin.email && email.toLowerCase() === admin.email.toLowerCase() && calculatedHash === admin.passwordHash;
-
-  // Smart self-healing fallback: If they type the default password 'admin' for any recognized admin email, let them in and heal the DB credentials!
-  const isSelfHealingEmail = [
-    'thedelusiongaming024@gmail.com',
-    'rakibfamily01@gmail.com',
-    'admin@b2bfiy.com',
-    'admin@admin.com',
-    'admin',
-    'info@b2bfiy.com',
-    admin.email?.toLowerCase()
-  ].filter(Boolean).includes(email.trim().toLowerCase());
-
-  const isSelfHealingMatch = isSelfHealingEmail && password === 'admin';
-
-  if (isCorrectStandard || isSelfHealingMatch) {
-    // If self-healed, rewrite and save the new credentials to prevent future mismatches
-    if (isSelfHealingMatch && (!isCorrectStandard || !admin.salt)) {
-      console.log(`[Self-Healing Auth] Admin used default password 'admin' for recognized email ${email}. Re-seeding admin credentials...`);
-      const crypto = await import('crypto');
-      const newSalt = crypto.randomBytes(16).toString('hex');
-      const newHash = hashPassword('admin', newSalt);
-      
-      state.admin = {
-        email: email.toLowerCase(),
-        passwordHash: newHash,
-        salt: newSalt
-      };
-      
-      // Update db.json & sync to Supabase table
-      await dbInstance.updateSection('admin', state.admin);
+  try {
+    const { email, password } = req.body || {};
+    
+    if (!email || !password) {
+       res.status(400).json({ error: 'Email and password are required' });
+       return;
     }
 
-    const finalEmail = email.toLowerCase();
-    const token = generateToken(finalEmail);
-    res.json({ success: true, token, email: finalEmail });
-  } else {
-    res.status(401).json({ error: 'Invalid email or password' });
+    const state = dbInstance.getState();
+    const admin = state.admin || { email: 'thedelusiongaming024@gmail.com', salt: '', passwordHash: '' };
+    
+    // Check standard credentials
+    let calculatedHash = '';
+    if (admin.salt) {
+      calculatedHash = hashPassword(password, admin.salt);
+    }
+    
+    const isCorrectStandard = admin.email && email.toLowerCase() === admin.email.toLowerCase() && calculatedHash === admin.passwordHash;
+
+    // Smart self-healing fallback: If they type the default password 'admin' for any recognized admin email, let them in and heal the DB credentials!
+    const isSelfHealingEmail = [
+      'thedelusiongaming024@gmail.com',
+      'rakibfamily01@gmail.com',
+      'admin@b2bfiy.com',
+      'admin@admin.com',
+      'admin',
+      'info@b2bfiy.com',
+      admin.email?.toLowerCase()
+    ].filter(Boolean).includes(email.trim().toLowerCase());
+
+    const isSelfHealingMatch = isSelfHealingEmail && password === 'admin';
+
+    if (isCorrectStandard || isSelfHealingMatch) {
+      // If self-healed, rewrite and save the new credentials to prevent future mismatches
+      if (isSelfHealingMatch && (!isCorrectStandard || !admin.salt)) {
+        console.log(`[Self-Healing Auth] Admin used default password 'admin' for recognized email ${email}. Re-seeding admin credentials...`);
+        const newSalt = crypto.randomBytes(16).toString('hex');
+        const newHash = hashPassword('admin', newSalt);
+        
+        state.admin = {
+          email: email.toLowerCase(),
+          passwordHash: newHash,
+          salt: newSalt
+        };
+        
+        // Update db.json & sync to Supabase table
+        await dbInstance.updateSection('admin', state.admin);
+      }
+
+      const finalEmail = email.toLowerCase();
+      const token = generateToken(finalEmail);
+      res.json({ success: true, token, email: finalEmail });
+    } else {
+      res.status(401).json({ error: 'Invalid email or password' });
+    }
+  } catch (err: any) {
+    console.error('[Auth Login Endpoint Error]:', err);
+    res.status(500).json({ 
+      error: `Server-side authentication failed: ${err?.message || err || 'Unknown Error'}` 
+    });
   }
 });
 
