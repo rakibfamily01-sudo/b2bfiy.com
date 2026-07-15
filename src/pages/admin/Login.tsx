@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { useApp } from '../../components/AppContext';
-import { Lock, User, Eye, EyeOff, Sparkles, ArrowRight } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, Sparkles, ArrowRight, Database, AlertTriangle, CheckCircle, Code, Copy, Check } from 'lucide-react';
+
+interface DBStatus {
+  supabaseEnabled: boolean;
+  lastCloudError: string | null;
+  supabaseUrlConfigured: boolean;
+  supabaseKeyConfigured: boolean;
+  adminEmail: string;
+}
 
 export default function Login() {
   const { login, showToast, navigateTo, isAdminVerified } = useApp();
@@ -9,6 +17,8 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [dbStatus, setDbStatus] = useState<DBStatus | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Automatically redirect if already logged in
   React.useEffect(() => {
@@ -16,6 +26,24 @@ export default function Login() {
       navigateTo('/admin');
     }
   }, [isAdminVerified, navigateTo]);
+
+  // Fetch Supabase & Database status
+  React.useEffect(() => {
+    fetch('/api/auth/db-status')
+      .then(res => {
+        if (!res.ok) throw new Error('Status endpoint failed');
+        return res.json();
+      })
+      .then(data => {
+        setDbStatus(data);
+        if (data.adminEmail) {
+          setEmail(data.adminEmail);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load database status:', err);
+      });
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,10 +74,28 @@ export default function Login() {
     }
   };
 
+  const sqlCommand = `-- Paste this SQL query into your Supabase SQL Editor:
+CREATE TABLE IF NOT EXISTS app_state (
+  id BIGINT PRIMARY KEY,
+  state JSONB NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Disable Row Level Security (RLS) so our secure Vercel Express backend can read & write
+ALTER TABLE app_state DISABLE ROW LEVEL SECURITY;`;
+
+  const copySqlToClipboard = () => {
+    navigator.clipboard.writeText(sqlCommand);
+    setCopied(true);
+    showToast('SQL copied to clipboard!', 'success');
+    setTimeout(() => setCopied(false), 3000);
+  };
+
   return (
-    <div className="min-h-screen bg-brand-warm-bg flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-brand-warm-bg flex flex-col md:flex-row items-center justify-center p-4 md:p-8 gap-8 relative overflow-hidden">
       <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-brand-soft-red rounded-full filter blur-3xl opacity-30 -z-10 animate-pulse"></div>
       
+      {/* Login Box */}
       <div className="max-w-md w-full bg-brand-pure-white rounded-3xl border border-brand-border shadow-xl p-8 md:p-10 relative overflow-hidden">
         {/* Brand identity */}
         <div className="text-center mb-8">
@@ -100,6 +146,9 @@ export default function Login() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            <span className="block mt-1 text-[10px] text-brand-secondary">
+              Default password is <code className="bg-brand-warm-bg px-1 py-0.5 rounded text-brand-primary font-bold">admin</code>
+            </span>
           </div>
 
           {/* Submit Button */}
@@ -119,6 +168,97 @@ export default function Login() {
             Designed by B2bfiy Studio. Secure PBKDF2 Transactional Locks.
           </p>
         </div>
+      </div>
+
+      {/* Diagnostics Panel (Vercel & Supabase Status Guide) */}
+      <div className="max-w-md w-full bg-brand-pure-white rounded-3xl border border-brand-border shadow-xl p-6 relative overflow-hidden flex flex-col gap-4 text-brand-dark">
+        <div className="flex items-center gap-2 border-b border-brand-border pb-3">
+          <Database className="w-5 h-5 text-brand-primary" />
+          <h3 className="font-black text-sm uppercase tracking-wider">Vercel & Supabase Diagnostics</h3>
+        </div>
+
+        {dbStatus ? (
+          <div className="flex flex-col gap-3 text-xs">
+            {/* Supabase connection state */}
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-brand-warm-bg">
+              <span className="font-bold text-brand-secondary">Supabase Cloud Sync</span>
+              {dbStatus.supabaseEnabled ? (
+                <span className="px-2.5 py-1 bg-green-100 text-green-800 text-[10px] font-bold rounded-full flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3" /> Enabled
+                </span>
+              ) : (
+                <span className="px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" /> Local Mode Only
+                </span>
+              )}
+            </div>
+
+            {/* Config details */}
+            <div className="space-y-1 text-[11px] text-brand-secondary bg-brand-warm-bg p-3 rounded-xl border border-brand-border">
+              <div className="flex justify-between">
+                <span>SUPABASE_URL:</span>
+                <span className="font-bold text-brand-dark">{dbStatus.supabaseUrlConfigured ? '✅ Configured' : '❌ Missing'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>SUPABASE_KEY:</span>
+                <span className="font-bold text-brand-dark">{dbStatus.supabaseKeyConfigured ? '✅ Configured' : '❌ Missing'}</span>
+              </div>
+            </div>
+
+            {/* Error notifications */}
+            {dbStatus.supabaseEnabled && dbStatus.lastCloudError ? (
+              <div className="p-3 bg-red-50 text-red-800 border border-red-200 rounded-xl space-y-2">
+                <div className="flex items-start gap-1.5 font-bold text-[11px]">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+                  <span>Cloud DB Sync Failure:</span>
+                </div>
+                <p className="text-[10px] bg-red-100 p-1.5 rounded font-mono break-all">{dbStatus.lastCloudError}</p>
+                <p className="text-[10px] text-red-700 leading-relaxed">
+                  This usually means the required table is missing, or Row Level Security (RLS) is blocking Vercel. Run the SQL script below inside Supabase to resolve this.
+                </p>
+              </div>
+            ) : dbStatus.supabaseEnabled ? (
+              <div className="p-3 bg-green-50 text-green-800 border border-green-200 rounded-xl flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="font-bold text-[11px]">Supabase is connected and synced perfectly!</span>
+              </div>
+            ) : (
+              <div className="p-3 bg-amber-50 text-amber-900 border border-amber-200 rounded-xl space-y-1.5">
+                <span className="font-bold block text-[11px]">⚠️ Ephemeral Storage warning:</span>
+                <p className="text-[10px] text-amber-800 leading-normal">
+                  Vercel resets server storage on every redeploy or cold start. Changes you make will be <strong>lost</strong> unless you configure Supabase variables in Vercel.
+                </p>
+              </div>
+            )}
+
+            {/* Action instructions to create table */}
+            <div className="mt-2 border-t border-brand-border pt-3 space-y-2">
+              <span className="font-bold text-brand-dark flex items-center gap-1">
+                <Code className="w-4 h-4 text-brand-primary" /> Setup Instruction (Supabase)
+              </span>
+              <p className="text-[10px] text-brand-secondary">
+                To create the database schema in Supabase, go to your <strong>Supabase Dashboard &gt; SQL Editor &gt; New Query</strong>, paste the script below, and click <strong>Run</strong>:
+              </p>
+
+              <div className="relative mt-2">
+                <pre className="text-[9px] font-mono bg-brand-dark text-brand-pure-white p-3 rounded-xl overflow-x-auto max-h-40 leading-normal whitespace-pre">
+                  {sqlCommand}
+                </pre>
+                <button
+                  onClick={copySqlToClipboard}
+                  className="absolute top-2 right-2 p-1.5 bg-brand-primary text-brand-pure-white hover:bg-brand-coral rounded-lg cursor-pointer transition-colors"
+                  title="Copy SQL Script"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center py-10 text-brand-secondary text-xs">
+            Loading diagnostics...
+          </div>
+        )}
       </div>
     </div>
   );

@@ -224,6 +224,21 @@ apiRouter.get('/auth/verify', (req, res) => {
   }
 });
 
+// Database status endpoint (crucial for diagnostics on Vercel/Supabase)
+apiRouter.get('/auth/db-status', (req, res) => {
+  const isSupabaseEnabled = dbInstance.getIsSupabaseEnabled();
+  const lastCloudError = dbInstance.lastCloudError;
+  const state = dbInstance.getState();
+  
+  res.json({
+    supabaseEnabled: isSupabaseEnabled,
+    lastCloudError: lastCloudError || null,
+    supabaseUrlConfigured: !!(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL),
+    supabaseKeyConfigured: !!(process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY),
+    adminEmail: state?.admin?.email || 'thedelusiongaming024@gmail.com',
+  });
+});
+
 // Logout endpoint
 apiRouter.post('/auth/logout', (req, res) => {
   res.json({ success: true });

@@ -563,6 +563,7 @@ class JSONDatabase {
   private state: DatabaseState | null = null;
   private isSupabaseEnabled: boolean = false;
   private supabasePromise: Promise<DatabaseState> | null = null;
+  public lastCloudError: string | null = null;
 
   constructor() {
     this.isSupabaseEnabled = !!supabase;
@@ -572,6 +573,10 @@ class JSONDatabase {
       console.log("[Local DB] No Supabase credentials detected. Running in Local JSON Mode.");
       this.load();
     }
+  }
+
+  public getIsSupabaseEnabled(): boolean {
+    return this.isSupabaseEnabled;
   }
 
   // Ensure state is loaded asynchronously (essential for Serverless / Vercel Cold Starts)
@@ -607,22 +612,30 @@ class JSONDatabase {
             
             if (insertError) {
               console.error("[Supabase] Failed to seed default state:", insertError);
+              this.lastCloudError = `Seed failed: ${insertError.message}`;
+            } else {
+              this.lastCloudError = null;
             }
             this.state = initialState;
           } else {
             console.error("[Supabase] Error retrieving state from cloud:", error);
+            this.lastCloudError = error.message;
             this.state = this.loadLocal();
           }
         } else if (data && data.state) {
           console.log("[Supabase] Successfully synchronized state from Cloud!");
           this.state = data.state as DatabaseState;
+          this.lastCloudError = null;
           this.sanitizeState();
         } else {
           console.log("[Supabase] Empty payload received. Loading local fallback.");
+          this.lastCloudError = "Empty payload received from Supabase.";
           this.state = this.loadLocal();
         }
       } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
         console.error("[Supabase] Cloud connection failed. Using local storage.", err);
+        this.lastCloudError = errMsg;
         this.state = this.loadLocal();
       } finally {
         this.supabasePromise = null;
