@@ -677,8 +677,10 @@ class JSONDatabase {
         } else {
           this.lastCloudError = null;
           console.log("[Supabase] Successfully synchronized all individual tables from Cloud!");
-          // Proactively seed any tables that exist but are empty
-          await this.seedMissingTables(keys);
+          // Proactively seed any tables that exist but are empty in the background (DO NOT await here)
+          this.seedMissingTables(keys).catch(err => {
+            console.error("[Supabase Background Seed] Failed:", err);
+          });
         }
       } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
@@ -689,9 +691,9 @@ class JSONDatabase {
       return this.state!;
     })();
 
-    // 2.5 seconds timeout to allow fast fallback on slow connections
+    // 5.0 seconds timeout to allow fallback on extremely slow connections
     const timeoutTask = new Promise<DatabaseState>((_, reject) => {
-      setTimeout(() => reject(new Error("Supabase connection timed out after 2.5 seconds")), 2500);
+      setTimeout(() => reject(new Error("Supabase connection timed out after 5 seconds")), 5000);
     });
 
     this.supabasePromise = Promise.race([loadTask, timeoutTask])
@@ -709,30 +711,37 @@ class JSONDatabase {
     return this.supabasePromise;
   }
 
-  // Background seed check to populate newly created tables with default state if empty
+  // Background seed check to populate newly created tables with default state if empty in parallel
   private async seedMissingTables(keys: Array<keyof typeof SECTION_TABLES>): Promise<void> {
     if (!this.state || !this.isSupabaseEnabled) return;
     
-    for (const key of keys) {
-      const table = SECTION_TABLES[key];
-      try {
-        const { data, error } = await supabase!
-          .from(table)
-          .select('id')
-          .eq('id', 1)
-          .maybeSingle();
-        
-        if (!error && !data) {
-          console.log(`[Supabase] Seeding default values for newly initialized table ${table}...`);
-          const sectionData = this.state[key];
-          await supabase!
+    console.log("[Supabase] Initiating parallel background seed check for empty tables...");
+    const start = Date.now();
+    
+    await Promise.all(
+      keys.map(async (key) => {
+        const table = SECTION_TABLES[key];
+        try {
+          const { data, error } = await supabase!
             .from(table)
-            .insert([{ id: 1, data: sectionData }]);
+            .select('id')
+            .eq('id', 1)
+            .maybeSingle();
+          
+          if (!error && !data) {
+            console.log(`[Supabase] Seeding default values for newly initialized table ${table}...`);
+            const sectionData = this.state![key];
+            await supabase!
+              .from(table)
+              .insert([{ id: 1, data: sectionData }]);
+          }
+        } catch (err) {
+          console.error(`[Supabase] Background seed check failed for table ${table}:`, err);
         }
-      } catch (err) {
-        console.error(`[Supabase] Background seed check failed for ${table}:`, err);
-      }
-    }
+      })
+    );
+    
+    console.log(`[Supabase] Parallel background seed check complete in ${Date.now() - start}ms.`);
   }
 
   // Sanitize and guarantee default structures exist
