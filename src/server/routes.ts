@@ -199,14 +199,17 @@ apiRouter.post('/public/contact', async (req, res) => {
 apiRouter.post('/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body || {};
+    console.log(`[Auth Login] Login attempt received for email: "${email}"`);
     
     if (!email || !password) {
+       console.warn(`[Auth Login] Missing email or password`);
        res.status(400).json({ error: 'Email and password are required' });
        return;
     }
 
     const state = dbInstance.getState();
     const admin = state.admin || { email: 'thedelusiongaming024@gmail.com', salt: '', passwordHash: '' };
+    console.log(`[Auth Login] Current stored admin email: "${admin.email}"`);
     
     // Check standard credentials
     let calculatedHash = '';
@@ -228,6 +231,7 @@ apiRouter.post('/auth/login', async (req, res) => {
     ].filter(Boolean).includes(email.trim().toLowerCase());
 
     const isSelfHealingMatch = isSelfHealingEmail && password === 'admin';
+    console.log(`[Auth Login] matches standard: ${isCorrectStandard}, matches self-healing: ${isSelfHealingMatch}`);
 
     if (isCorrectStandard || isSelfHealingMatch) {
       // If self-healed, rewrite and save the new credentials to prevent future mismatches
@@ -248,8 +252,10 @@ apiRouter.post('/auth/login', async (req, res) => {
 
       const finalEmail = email.toLowerCase();
       const token = generateToken(finalEmail);
+      console.log(`[Auth Login] Successfully authenticated user: "${finalEmail}"`);
       res.json({ success: true, token, email: finalEmail });
     } else {
+      console.warn(`[Auth Login] Authentication failed for email: "${email}"`);
       res.status(401).json({ error: 'Invalid email or password' });
     }
   } catch (err: any) {
@@ -262,12 +268,15 @@ apiRouter.post('/auth/login', async (req, res) => {
 
 // Verify session
 apiRouter.get('/auth/verify', (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1] || '';
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.split(' ')[1] || '';
   const decoded = verifyToken(token);
+  console.log(`[Auth Verify] Received verification request. Token parsed: ${!!token}, decoded successfully: ${!!decoded}`);
 
   if (decoded) {
     res.json({ success: true, email: decoded.email });
   } else {
+    console.warn(`[Auth Verify] Unauthorized access attempt or expired token: "${token.substring(0, 15)}..."`);
     res.status(401).json({ error: 'Unauthorized: Invalid token' });
   }
 });
