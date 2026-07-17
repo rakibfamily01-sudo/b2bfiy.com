@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { SiteSettings, TopBarSettings, HeaderSettings, HeroSettings, StatisticItem, ClientLogo, ServiceItem, WhyChooseUsItem, PortfolioCategory, PortfolioProject, WorkProcessStep, PackageItem, TestimonialItem, FAQItem } from '../types';
+import fallbackData from '../../data.json';
 
 interface AppContextProps {
   settings: SiteSettings | null;
@@ -25,21 +26,37 @@ interface AppContextProps {
 
 const AppContext = createContext<AppContextProps | null>(null);
 
+const safeFetchJson = async (url: string) => {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const contentType = res.headers.get('content-type');
+    if (contentType && !contentType.includes('application/json')) {
+      return null;
+    }
+    const text = await res.text();
+    if (text.trim().startsWith('<')) return null; // It's HTML, not JSON
+    return JSON.parse(text);
+  } catch (err) {
+    return null;
+  }
+};
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [topbar, setTopbar] = useState<TopBarSettings | null>(null);
-  const [header, setHeader] = useState<HeaderSettings | null>(null);
-  const [hero, setHero] = useState<HeroSettings | null>(null);
-  const [statistics, setStatistics] = useState<StatisticItem[]>([]);
-  const [clientLogos, setClientLogos] = useState<ClientLogo[]>([]);
-  const [services, setServices] = useState<ServiceItem[]>([]);
-  const [whyChooseUs, setWhyChooseUs] = useState<WhyChooseUsItem[]>([]);
-  const [portfolioCategories, setPortfolioCategories] = useState<PortfolioCategory[]>([]);
-  const [portfolioProjects, setPortfolioProjects] = useState<PortfolioProject[]>([]);
-  const [workProcess, setWorkProcess] = useState<WorkProcessStep[]>([]);
-  const [packages, setPackages] = useState<PackageItem[]>([]);
-  const [testimonials, setTestimonials] = useState<TestimonialItem[]>([]);
-  const [faqs, setFaqs] = useState<FAQItem[]>([]);
+  const [settings, setSettings] = useState<SiteSettings | null>(fallbackData.settings as any);
+  const [topbar, setTopbar] = useState<TopBarSettings | null>(fallbackData.topbar as any);
+  const [header, setHeader] = useState<HeaderSettings | null>(fallbackData.header as any);
+  const [hero, setHero] = useState<HeroSettings | null>(fallbackData.hero as any);
+  const [statistics, setStatistics] = useState<StatisticItem[]>(fallbackData.statistics as any || []);
+  const [clientLogos, setClientLogos] = useState<ClientLogo[]>(fallbackData.clientLogos as any || []);
+  const [services, setServices] = useState<ServiceItem[]>(fallbackData.services as any || []);
+  const [whyChooseUs, setWhyChooseUs] = useState<WhyChooseUsItem[]>(fallbackData.whyChooseUs as any || []);
+  const [portfolioCategories, setPortfolioCategories] = useState<PortfolioCategory[]>(fallbackData.portfolioCategories as any || []);
+  const [portfolioProjects, setPortfolioProjects] = useState<PortfolioProject[]>(fallbackData.portfolioProjects as any || []);
+  const [workProcess, setWorkProcess] = useState<WorkProcessStep[]>(fallbackData.workProcess as any || []);
+  const [packages, setPackages] = useState<PackageItem[]>(fallbackData.packages as any || []);
+  const [testimonials, setTestimonials] = useState<TestimonialItem[]>(fallbackData.testimonials as any || []);
+  const [faqs, setFaqs] = useState<FAQItem[]>(fallbackData.faqs as any || []);
   const [adminSession, setAdminSession] = useState<{ authenticated: boolean; email?: string; username?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,18 +76,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         testimonialsRes,
         faqsRes
       ] = await Promise.all([
-        fetch('/api/settings').then(r => r.json()),
-        fetch('/api/hero').then(r => r.json()),
-        fetch('/api/statistics').then(r => r.json()),
-        fetch('/api/client-logos').then(r => r.json()),
-        fetch('/api/services').then(r => r.json()),
-        fetch('/api/why-choose-us').then(r => r.json()),
-        fetch('/api/portfolio-categories').then(r => r.json()),
-        fetch('/api/portfolio').then(r => r.json()),
-        fetch('/api/work-process').then(r => r.json()),
-        fetch('/api/packages').then(r => r.json()),
-        fetch('/api/testimonials').then(r => r.json()),
-        fetch('/api/faqs').then(r => r.json())
+        safeFetchJson('/api/settings'),
+        safeFetchJson('/api/hero'),
+        safeFetchJson('/api/statistics'),
+        safeFetchJson('/api/client-logos'),
+        safeFetchJson('/api/services'),
+        safeFetchJson('/api/why-choose-us'),
+        safeFetchJson('/api/portfolio-categories'),
+        safeFetchJson('/api/portfolio'),
+        safeFetchJson('/api/work-process'),
+        safeFetchJson('/api/packages'),
+        safeFetchJson('/api/testimonials'),
+        safeFetchJson('/api/faqs')
       ]);
 
       if (settingsRes) {
@@ -78,17 +95,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setTopbar(settingsRes.topbar);
         setHeader(settingsRes.header);
       }
-      setHero(heroRes);
-      setStatistics(statsRes || []);
-      setClientLogos(logosRes || []);
-      setServices(servicesRes || []);
-      setWhyChooseUs(whyRes || []);
-      setPortfolioCategories(categoriesRes || []);
-      setPortfolioProjects(portfolioRes || []);
-      setWorkProcess(processRes || []);
-      setPackages(packagesRes || []);
-      setTestimonials(testimonialsRes || []);
-      setFaqs(faqsRes || []);
+      if (heroRes) setHero(heroRes);
+      if (statsRes) setStatistics(statsRes);
+      if (logosRes) setClientLogos(logosRes);
+      if (servicesRes) setServices(servicesRes);
+      if (whyRes) setWhyChooseUs(whyRes);
+      if (categoriesRes) setPortfolioCategories(categoriesRes);
+      if (portfolioRes) setPortfolioProjects(portfolioRes);
+      if (processRes) setWorkProcess(processRes);
+      if (packagesRes) setPackages(packagesRes);
+      if (testimonialsRes) setTestimonials(testimonialsRes);
+      if (faqsRes) setFaqs(faqsRes);
     } catch (e) {
       console.error('Error loading global site content:', e);
     } finally {
