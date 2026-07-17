@@ -1,141 +1,155 @@
 import React from 'react';
 import { useApp } from './AppContext';
-import { Link } from './Router';
-import { Phone, Mail, MapPin, Facebook, Instagram, Linkedin, Youtube, MessageSquare } from 'lucide-react';
+import { Phone, Mail, MapPin, Facebook, Instagram, Linkedin, Youtube, ArrowUpRight } from 'lucide-react';
 
 export default function Footer() {
-  const { settings, services } = useApp();
+  const { navigateTo, data } = useApp();
+  const settings = data?.settings;
+  const navItems = data?.navigation_items || [];
+  const services = data?.services || [];
 
-  if (!settings) return null;
-
-  const currentYear = new Date().getFullYear();
-
-  const socialLinks = [
-    { icon: Facebook, url: settings.facebook, label: 'Facebook' },
-    { icon: Instagram, url: settings.instagram, label: 'Instagram' },
-    { icon: Linkedin, url: settings.linkedin, label: 'LinkedIn' },
-    { icon: Youtube, url: settings.youtube, label: 'YouTube' }
-  ].filter(s => s.url);
-
-  // Take first 4 services or default
-  const footerServices = services.length > 0 ? services : [
-    { title: 'Website Development', id: 'web-dev' },
-    { title: 'Graphic Design', id: 'graphic-design' },
-    { title: 'Video Editing', id: 'video-editing' },
-    { title: 'Social Media Management', id: 'social-media' }
-  ];
+  const handleNavClick = (url: string) => {
+    navigateTo(url);
+  };
 
   return (
-    <footer className="bg-dark text-white border-t-4 border-primary">
-      {/* Top Section */}
-      <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-        {/* Col 1: About Agency */}
+    <footer className="bg-brand-dark text-brand-pure-white pt-16 pb-8 border-t border-gray-800">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        {/* Column 1: Brand intro */}
         <div className="flex flex-col gap-4">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <span className="font-extrabold text-xl text-white tracking-tighter">B</span>
-            </div>
-            <span className="font-extrabold text-2xl tracking-tight text-white">{settings.name}</span>
-          </Link>
-          <p className="text-gray-400 text-sm leading-relaxed">
-            {settings.defaultSeoDescription}
+          <div 
+            onClick={() => handleNavClick('/')}
+            className="flex items-center gap-2.5 cursor-pointer group w-fit"
+          >
+            {/* Render image/icon if display is 'logo' or 'both' or undefined */}
+            {(settings?.logoDisplayType === 'logo' || settings?.logoDisplayType === 'both' || !settings?.logoDisplayType) && (
+              settings?.logo ? (
+                <img 
+                  src={settings.logo} 
+                  alt={settings?.logoText || settings?.name || 'Logo'} 
+                  className="h-10 w-auto max-w-[120px] object-contain transition-transform group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-brand-primary flex justify-center items-center font-extrabold text-brand-pure-white text-xl">
+                  {(settings?.logoText || settings?.name || 'B')[0].toUpperCase()}
+                </div>
+              )
+            )}
+
+            {/* Render text if display is 'text' or 'both' or undefined */}
+            {(settings?.logoDisplayType === 'text' || settings?.logoDisplayType === 'both' || !settings?.logoDisplayType) && (
+              <span className="font-extrabold text-2xl tracking-tight text-brand-pure-white">
+                {settings?.logoText !== undefined ? settings.logoText : (settings?.name || 'B2bfiy')}
+              </span>
+            )}
+          </div>
+          <p className="text-gray-400 text-sm leading-relaxed mt-2">
+            {settings?.footerDescription || 'B2bfiy helps businesses build a powerful digital presence through high-converting websites, premium graphics, professional video clips, and comprehensive social media scaling.'}
           </p>
-          <div className="flex items-center gap-3 mt-2">
-            {socialLinks.map((s, idx) => {
-              const Icon = s.icon;
-              return (
-                <a
-                  key={idx}
-                  href={s.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  className="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center hover:bg-primary text-gray-400 hover:text-white transition-all hover:scale-110"
+          {/* Socials Grid */}
+          <div className="flex items-center gap-3.5 mt-4">
+            {settings?.facebook && (
+              <a href={settings.facebook} target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-800 hover:bg-brand-primary text-gray-300 hover:text-brand-pure-white rounded-full transition-all hover:-translate-y-1">
+                <Facebook className="w-4 h-4" />
+              </a>
+            )}
+            {settings?.instagram && (
+              <a href={settings.instagram} target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-800 hover:bg-brand-primary text-gray-300 hover:text-brand-pure-white rounded-full transition-all hover:-translate-y-1">
+                <Instagram className="w-4 h-4" />
+              </a>
+            )}
+            {settings?.linkedin && (
+              <a href={settings.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-800 hover:bg-brand-primary text-gray-300 hover:text-brand-pure-white rounded-full transition-all hover:-translate-y-1">
+                <Linkedin className="w-4 h-4" />
+              </a>
+            )}
+            {settings?.youtube && (
+              <a href={settings.youtube} target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-800 hover:bg-brand-primary text-gray-300 hover:text-brand-pure-white rounded-full transition-all hover:-translate-y-1">
+                <Youtube className="w-4 h-4" />
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Column 2: Quick links */}
+        <div>
+          <h4 className="text-sm font-bold uppercase tracking-wider text-brand-coral mb-6">Quick Links</h4>
+          <ul className="flex flex-col gap-3">
+            {navItems.map((item) => (
+              <li key={item.id}>
+                <button
+                  onClick={() => handleNavClick(item.url)}
+                  className="text-gray-400 hover:text-brand-pure-white text-sm transition-colors flex items-center gap-1 group cursor-pointer text-left"
                 >
-                  <Icon size={16} />
-                </a>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Col 2: Quick Links */}
-        <div className="flex flex-col gap-4">
-          <h4 className="font-bold text-lg text-white border-b border-gray-800 pb-2">Quick Links</h4>
-          <div className="grid grid-cols-1 gap-2.5 text-sm text-gray-400">
-            <Link to="/" className="hover:text-primary hover:translate-x-1 transition-all">Home</Link>
-            <Link to="/services" className="hover:text-primary hover:translate-x-1 transition-all">Services</Link>
-            <Link to="/portfolio" className="hover:text-primary hover:translate-x-1 transition-all">Portfolio</Link>
-            <Link to="/packages" className="hover:text-primary hover:translate-x-1 transition-all">Packages</Link>
-            <Link to="/about" className="hover:text-primary hover:translate-x-1 transition-all">About Us</Link>
-            <Link to="/contact" className="hover:text-primary hover:translate-x-1 transition-all">Contact</Link>
-          </div>
-        </div>
-
-        {/* Col 3: Services */}
-        <div className="flex flex-col gap-4">
-          <h4 className="font-bold text-lg text-white border-b border-gray-800 pb-2">Our Services</h4>
-          <div className="grid grid-cols-1 gap-2.5 text-sm text-gray-400">
-            {footerServices.map((srv, idx) => (
-              <Link
-                key={idx}
-                to="/services"
-                className="hover:text-primary hover:translate-x-1 transition-all"
-              >
-                {srv.title}
-              </Link>
+                  <span className="w-1 h-1 rounded-full bg-brand-coral opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  {item.label}
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
-        {/* Col 4: Contact Info */}
+        {/* Column 3: Services */}
+        <div>
+          <h4 className="text-sm font-bold uppercase tracking-wider text-brand-coral mb-6">Our Services</h4>
+          <ul className="flex flex-col gap-3">
+            {services.slice(0, 4).map((srv) => (
+              <li key={srv.id}>
+                <button
+                  onClick={() => handleNavClick('/services')}
+                  className="text-gray-400 hover:text-brand-pure-white text-sm transition-colors text-left flex items-center gap-1 group cursor-pointer"
+                >
+                  <span className="w-1 h-1 rounded-full bg-brand-coral opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  {srv.title}
+                </button>
+              </li>
+            ))}
+            {services.length === 0 && (
+              <>
+                <li><button onClick={() => handleNavClick('/services')} className="text-gray-400 hover:text-brand-pure-white text-sm">Website Development</button></li>
+                <li><button onClick={() => handleNavClick('/services')} className="text-gray-400 hover:text-brand-pure-white text-sm">Graphic Design</button></li>
+                <li><button onClick={() => handleNavClick('/services')} className="text-gray-400 hover:text-brand-pure-white text-sm">Video Editing</button></li>
+                <li><button onClick={() => handleNavClick('/services')} className="text-gray-400 hover:text-brand-pure-white text-sm">Social Media Management</button></li>
+              </>
+            )}
+          </ul>
+        </div>
+
+        {/* Column 4: Contact info */}
         <div className="flex flex-col gap-4">
-          <h4 className="font-bold text-lg text-white border-b border-gray-800 pb-2">Contact Info</h4>
-          <div className="flex flex-col gap-3 text-sm text-gray-400">
-            {settings.phone && (
-              <a href={`tel:${settings.phone}`} className="flex items-start gap-2.5 hover:text-primary transition-colors">
-                <Phone size={16} className="text-primary mt-0.5 shrink-0" />
-                <span>{settings.phone}</span>
-              </a>
-            )}
-            {settings.email && (
-              <a href={`mailto:${settings.email}`} className="flex items-start gap-2.5 hover:text-primary transition-colors">
-                <Mail size={16} className="text-primary mt-0.5 shrink-0" />
-                <span>{settings.email}</span>
-              </a>
-            )}
-            {settings.address && (
-              <div className="flex items-start gap-2.5">
-                <MapPin size={16} className="text-primary mt-0.5 shrink-0" />
+          <h4 className="text-sm font-bold uppercase tracking-wider text-brand-coral mb-6">Contact Us</h4>
+          <ul className="flex flex-col gap-3.5 text-sm text-gray-400">
+            {settings?.address && (
+              <li className="flex items-start gap-2.5">
+                <MapPin className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
                 <span>{settings.address}</span>
-              </div>
+              </li>
             )}
-            {settings.whatsapp && (
-              <a
-                href={`https://wa.me/${settings.whatsapp.replace(/[^0-9]/g, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-2.5 text-green-400 hover:text-green-500 transition-colors"
-              >
-                <MessageSquare size={16} className="text-green-400 mt-0.5 shrink-0" />
-                <span>WhatsApp Inquiry Chat</span>
-              </a>
+            {settings?.phone && (
+              <li className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 text-brand-primary shrink-0" />
+                <a href={`tel:${settings.phone}`} className="hover:text-brand-pure-white transition-colors">{settings.phone}</a>
+              </li>
             )}
-          </div>
+            {settings?.email && (
+              <li className="flex items-center gap-2.5">
+                <Mail className="w-4 h-4 text-brand-primary shrink-0" />
+                <a href={`mailto:${settings.email}`} className="hover:text-brand-pure-white transition-colors">{settings.email}</a>
+              </li>
+            )}
+          </ul>
         </div>
       </div>
 
-      {/* Bottom Section */}
-      <div className="bg-neutral-950 text-gray-500 text-xs sm:text-sm py-6 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <span>
-            © {currentYear} <strong>{settings.name}</strong>. All rights reserved. 
-            {" "}Your business growth and digital solutions partner.
-          </span>
-          <div className="flex items-center gap-6">
-            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link>
-          </div>
+      <div className="h-px bg-gray-800 max-w-7xl mx-auto my-8 px-4 md:px-8"></div>
+
+      {/* Copy & Legal Links */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+        <p>{settings?.footerCopyright || `© ${new Date().getFullYear()} B2bfiy. All rights reserved.`}</p>
+        <div className="flex items-center gap-6">
+          <button onClick={() => handleNavClick('/privacy-policy')} className="hover:text-brand-pure-white transition-colors cursor-pointer">Privacy Policy</button>
+          <button onClick={() => handleNavClick('/terms')} className="hover:text-brand-pure-white transition-colors cursor-pointer">Terms & Conditions</button>
         </div>
       </div>
     </footer>

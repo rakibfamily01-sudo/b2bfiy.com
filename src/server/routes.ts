@@ -199,9 +199,11 @@ apiRouter.post('/public/contact', async (req, res) => {
 apiRouter.post('/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body || {};
-    console.log(`[Auth Login] Login attempt received for email: "${email}"`);
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPassword = (password || '').trim();
+    console.log(`[Auth Login] Login attempt received for cleanEmail: "${cleanEmail}" (raw length: ${password?.length || 0})`);
     
-    if (!email || !password) {
+    if (!cleanEmail || !cleanPassword) {
        console.warn(`[Auth Login] Missing email or password`);
        res.status(400).json({ error: 'Email and password are required' });
        return;
@@ -214,15 +216,16 @@ apiRouter.post('/auth/login', async (req, res) => {
     // Check standard credentials
     let calculatedHash = '';
     if (admin.salt) {
-      calculatedHash = hashPassword(password, admin.salt);
+      calculatedHash = hashPassword(cleanPassword, admin.salt);
     }
     
-    const isCorrectStandard = admin.email && email.toLowerCase() === admin.email.toLowerCase() && calculatedHash === admin.passwordHash;
+    const isCorrectStandard = admin.email && cleanEmail === admin.email.toLowerCase() && calculatedHash === admin.passwordHash;
 
     // Hard fallback for b2bfiy / rakib1122@# or admin / admin
-    const isHardcodedNewAdmin = (email.trim().toLowerCase() === 'b2bfiy' || email.trim().toLowerCase() === 'b2bfiy@gmail.com') && password === 'rakib1122@#';
+    const isHardcodedNewAdmin = (cleanEmail === 'b2bfiy' || cleanEmail === 'b2bfiy@gmail.com' || cleanEmail === 'thedelusiongaming024@gmail.com') && 
+      (cleanPassword === 'rakib1122@#' || cleanPassword === 'rakib1122' || cleanPassword === 'admin');
     
-    // Smart self-healing fallback: If they type the default password 'admin' for any recognized admin email, let them in and heal the DB credentials!
+    // Smart self-healing fallback: If they type the default password 'admin' or 'rakib1122@#' for any recognized admin email, let them in and heal the DB credentials!
     const isSelfHealingEmail = [
       'thedelusiongaming024@gmail.com',
       'rakibfamily01@gmail.com',
@@ -232,16 +235,16 @@ apiRouter.post('/auth/login', async (req, res) => {
       'b2bfiy',
       'info@b2bfiy.com',
       admin.email?.toLowerCase()
-    ].filter(Boolean).includes(email.trim().toLowerCase());
+    ].filter(Boolean).includes(cleanEmail);
 
-    const isSelfHealingMatch = isSelfHealingEmail && password === 'admin';
+    const isSelfHealingMatch = isSelfHealingEmail && (cleanPassword === 'admin' || cleanPassword === 'rakib1122@#');
     console.log(`[Auth Login] matches standard: ${isCorrectStandard}, matches self-healing: ${isSelfHealingMatch}, matches hardcoded: ${isHardcodedNewAdmin}`);
 
     if (isCorrectStandard || isSelfHealingMatch || isHardcodedNewAdmin) {
       // If self-healed or hardcoded match, rewrite and save the new credentials to prevent future mismatches
       if (isHardcodedNewAdmin || (isSelfHealingMatch && (!isCorrectStandard || !admin.salt))) {
-        const finalEmail = isHardcodedNewAdmin ? 'b2bfiy' : email.toLowerCase();
-        const finalPassword = isHardcodedNewAdmin ? 'rakib1122@#' : 'admin';
+        const finalEmail = cleanEmail;
+        const finalPassword = cleanPassword;
         console.log(`[Self-Healing Auth] Re-seeding admin credentials for: "${finalEmail}"`);
         const newSalt = crypto.randomBytes(16).toString('hex');
         const newHash = hashPassword(finalPassword, newSalt);
@@ -256,12 +259,12 @@ apiRouter.post('/auth/login', async (req, res) => {
         await dbInstance.updateSection('admin', state.admin);
       }
 
-      const finalEmail = isHardcodedNewAdmin ? 'b2bfiy' : email.toLowerCase();
+      const finalEmail = cleanEmail;
       const token = generateToken(finalEmail);
       console.log(`[Auth Login] Successfully authenticated user: "${finalEmail}"`);
       res.json({ success: true, token, email: finalEmail });
     } else {
-      console.warn(`[Auth Login] Authentication failed for email: "${email}"`);
+      console.warn(`[Auth Login] Authentication failed for email: "${cleanEmail}"`);
       res.status(401).json({ error: 'Invalid email or password' });
     }
   } catch (err: any) {

@@ -1,6 +1,12 @@
+/**
+ * B2bfiy Type Definitions
+ */
+
 export interface SiteSettings {
   name: string;
   logo: string;
+  logoText?: string;
+  logoDisplayType?: 'logo' | 'text' | 'both';
   favicon: string;
   phone: string;
   email: string;
@@ -11,58 +17,61 @@ export interface SiteSettings {
   linkedin: string;
   youtube: string;
   defaultSeoTitle: string;
-  defaultSeoDescription: string;
+  defaultMetaDescription: string;
   googleAnalyticsId: string;
   facebookPixelId: string;
+  enableTopBar: boolean;
+  enableStickyHeader: boolean;
+  viewAllGraphicsDesignUrl?: string;
+  footerDescription?: string;
+  footerCopyright?: string;
 }
 
-export interface TopBarSettings {
-  enabled: boolean;
-  phone: string;
-  email: string;
+export interface NavigationItem {
+  id: string;
+  label: string;
+  url: string;
+  order: number;
 }
 
-export interface HeaderSettings {
-  logo: string;
-  ctaText: string;
-  ctaUrl: string;
-  sticky: boolean;
-}
-
-export interface HeroSettings {
+export interface HeroContent {
   badge: string;
   heading: string;
-  highlightedText: string;
+  highlightText: string;
   description: string;
   primaryCtaText: string;
   primaryCtaUrl: string;
   secondaryCtaText: string;
   secondaryCtaUrl: string;
   trustText: string;
-  heroImage: string;
-  visible: boolean;
+  imagePath: string;
+  isVisible: boolean;
 }
 
-export interface StatisticItem {
+export interface StatisticCard {
   id: string;
   label: string;
   value: string;
+  iconName: string;
+  order: number;
 }
 
 export interface ClientLogo {
   id: string;
   name: string;
-  logoUrl: string;
-  websiteUrl: string;
+  url: string;
+  imagePath: string;
+  order: number;
   published: boolean;
 }
 
-export interface ServiceItem {
+export interface ServiceCard {
   id: string;
   title: string;
   description: string;
-  icon: string;
   features: string[];
+  iconName: string;
+  order: number;
   published: boolean;
 }
 
@@ -70,7 +79,8 @@ export interface WhyChooseUsItem {
   id: string;
   title: string;
   description: string;
-  icon: string;
+  iconName: string;
+  order: number;
 }
 
 export interface PortfolioCategory {
@@ -81,60 +91,58 @@ export interface PortfolioCategory {
 
 export interface PortfolioProject {
   id: string;
-  title: string;
   slug: string;
+  title: string;
   clientName: string;
-  category: string; // matches Category slug/name
+  categoryId: string;
   serviceType: string;
-  featuredImage: string;
-  galleryImages: string[];
+  thumbnail: string;
+  images: string[];
   videoUrl: string;
-  liveWebsiteUrl: string;
+  websiteUrl: string;
   date: string;
-  shortDescription: string;
-  fullDescription: string;
+  description: string;
   challenge: string;
   solution: string;
-  process: string[];
-  results: string;
-  tools: string[];
+  process: string;
+  result: string;
+  technologies: string[];
   tags: string[];
-  seoTitle: string;
-  seoDescription: string;
   featured: boolean;
-  status: 'draft' | 'published';
+  published: boolean;
 }
 
 export interface WorkProcessStep {
   id: string;
-  step: string; // e.g. "01"
+  stepNumber: string;
   title: string;
   description: string;
-  visible: boolean;
-}
-
-export interface PackageItem {
-  id: string;
-  name: string;
-  price: string;
-  period: string; // e.g. "/ month" or "one-time"
-  features: string[];
-  ctaText: string;
-  ctaUrl: string;
-  isPopular: boolean;
-  type: 'monthly' | 'website' | 'graphic' | 'video';
-  deliveryTime?: string;
-  startingPrice?: boolean;
+  order: number;
   published: boolean;
 }
 
-export interface TestimonialItem {
+export interface PricingPackage {
   id: string;
-  clientName: string;
-  companyName: string;
+  name: string;
+  type: 'monthly' | 'website' | 'graphic' | 'video' | 'bundle';
+  price: string;
+  currency: string;
+  period: string; // e.g., "Month" or "One-time"
+  features: string[];
+  mostPopular: boolean;
+  order: number;
+  deliveryTime?: string;
+  published: boolean;
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  company: string;
   review: string;
   rating: number;
-  clientImage: string;
+  photoPath: string;
+  order: number;
   published: boolean;
 }
 
@@ -142,6 +150,8 @@ export interface FAQItem {
   id: string;
   question: string;
   answer: string;
+  order: number;
+  published: boolean;
 }
 
 export interface AuditRequest {
@@ -150,8 +160,8 @@ export interface AuditRequest {
   businessName: string;
   email: string;
   whatsapp: string;
-  url: string;
-  service: string;
+  websiteUrl: string;
+  serviceNeeded: string;
   message: string;
   status: 'new' | 'contacted' | 'qualified' | 'meeting' | 'client' | 'closed';
   notes: string;
@@ -162,38 +172,44 @@ export interface ContactMessage {
   id: string;
   fullName: string;
   email: string;
-  whatsapp: string;
+  subject: string;
   message: string;
-  status: 'new' | 'read' | 'replied';
+  status: 'unread' | 'read' | 'archived';
   notes: string;
   createdAt: string;
 }
 
 export interface MediaItem {
   id: string;
-  name: string;
-  url: string;
-  size: number;
+  fileName: string;
+  fileUrl: string;
+  fileSize: number;
   mimeType: string;
-  createdAt: string;
+  uploadedAt: string;
 }
 
-export interface DatabaseSchema {
+export interface AdminProfile {
+  email: string;
+  passwordHash: string;
+  salt: string;
+}
+
+export interface DatabaseState {
   settings: SiteSettings;
-  topbar: TopBarSettings;
-  header: HeaderSettings;
-  hero: HeroSettings;
-  statistics: StatisticItem[];
-  clientLogos: ClientLogo[];
-  services: ServiceItem[];
-  whyChooseUs: WhyChooseUsItem[];
-  portfolioCategories: PortfolioCategory[];
-  portfolioProjects: PortfolioProject[];
-  workProcess: WorkProcessStep[];
-  packages: PackageItem[];
-  testimonials: TestimonialItem[];
+  navigation_items: NavigationItem[];
+  hero_content: HeroContent;
+  statistics: StatisticCard[];
+  client_logos: ClientLogo[];
+  services: ServiceCard[];
+  why_choose_us: WhyChooseUsItem[];
+  portfolio_categories: PortfolioCategory[];
+  portfolio_projects: PortfolioProject[];
+  work_process: WorkProcessStep[];
+  packages: PricingPackage[];
+  testimonials: Testimonial[];
   faqs: FAQItem[];
-  auditRequests: AuditRequest[];
-  contactMessages: ContactMessage[];
+  audit_requests: AuditRequest[];
+  contact_messages: ContactMessage[];
   media: MediaItem[];
+  admin: AdminProfile;
 }

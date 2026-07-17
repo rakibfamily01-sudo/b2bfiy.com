@@ -1,163 +1,243 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { SiteSettings, TopBarSettings, HeaderSettings, HeroSettings, StatisticItem, ClientLogo, ServiceItem, WhyChooseUsItem, PortfolioCategory, PortfolioProject, WorkProcessStep, PackageItem, TestimonialItem, FAQItem } from '../types';
-import fallbackData from '../../data.json';
+import { DatabaseState, SiteSettings } from '../types';
+import { DEFAULT_STATE } from '../lib/defaultState';
 
-interface AppContextProps {
-  settings: SiteSettings | null;
-  topbar: TopBarSettings | null;
-  header: HeaderSettings | null;
-  hero: HeroSettings | null;
-  statistics: StatisticItem[];
-  clientLogos: ClientLogo[];
-  services: ServiceItem[];
-  whyChooseUs: WhyChooseUsItem[];
-  portfolioCategories: PortfolioCategory[];
-  portfolioProjects: PortfolioProject[];
-  workProcess: WorkProcessStep[];
-  packages: PackageItem[];
-  testimonials: TestimonialItem[];
-  faqs: FAQItem[];
-  adminSession: { authenticated: boolean; email?: string; username?: string } | null;
-  setAdminSession: React.Dispatch<React.SetStateAction<{ authenticated: boolean; email?: string; username?: string } | null>>;
-  loading: boolean;
-  refreshData: () => Promise<void>;
-  checkAdminSession: () => Promise<void>;
-}
-
-const AppContext = createContext<AppContextProps | null>(null);
-
-const safeFetchJson = async (url: string) => {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const contentType = res.headers.get('content-type');
-    if (contentType && !contentType.includes('application/json')) {
-      return null;
+// Safe localStorage wrapper to prevent crashes inside sandboxed iframes
+const memoryStorage: Record<string, string> = {};
+const safeStorage = {
+  getItem(key: string): string | null {
+    try {
+      return localStorage.getItem(key) || memoryStorage[key] || null;
+    } catch (e) {
+      return memoryStorage[key] || null;
     }
-    const text = await res.text();
-    if (text.trim().startsWith('<')) return null; // It's HTML, not JSON
-    return JSON.parse(text);
-  } catch (err) {
-    return null;
+  },
+  setItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn(`[SafeStorage] Failed to write ${key} to localStorage:`, e);
+    }
+    memoryStorage[key] = value;
+  },
+  removeItem(key: string): void {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.warn(`[SafeStorage] Failed to remove ${key} from localStorage:`, e);
+    }
+    delete memoryStorage[key];
   }
 };
 
+interface AppContextType {
+  // Navigation & Routing
+  currentPath: string;
+  navigateTo: (path: string) => void;
+  routeParams: Record<string, string>;
+
+  // Public/CMS Data Cache
+  data: Partial<DatabaseState> | null;
+  loading: boolean;
+  refreshData: () => Promise<void>;
+
+  // Admin authentication
+  token: string | null;
+  adminEmail: string | null;
+  login: (token: string, email: string) => void;
+  logout: () => Promise<void>;
+  isAdminVerified: boolean;
+  verifyAdminToken: () => Promise<boolean>;
+
+  // Notification Toast Helpers
+  toast: { message: string; type: 'success' | 'error' | null };
+  showToast: (msg: string, type: 'success' | 'error') => void;
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<SiteSettings | null>(fallbackData.settings as any);
-  const [topbar, setTopbar] = useState<TopBarSettings | null>(fallbackData.topbar as any);
-  const [header, setHeader] = useState<HeaderSettings | null>(fallbackData.header as any);
-  const [hero, setHero] = useState<HeroSettings | null>(fallbackData.hero as any);
-  const [statistics, setStatistics] = useState<StatisticItem[]>(fallbackData.statistics as any || []);
-  const [clientLogos, setClientLogos] = useState<ClientLogo[]>(fallbackData.clientLogos as any || []);
-  const [services, setServices] = useState<ServiceItem[]>(fallbackData.services as any || []);
-  const [whyChooseUs, setWhyChooseUs] = useState<WhyChooseUsItem[]>(fallbackData.whyChooseUs as any || []);
-  const [portfolioCategories, setPortfolioCategories] = useState<PortfolioCategory[]>(fallbackData.portfolioCategories as any || []);
-  const [portfolioProjects, setPortfolioProjects] = useState<PortfolioProject[]>(fallbackData.portfolioProjects as any || []);
-  const [workProcess, setWorkProcess] = useState<WorkProcessStep[]>(fallbackData.workProcess as any || []);
-  const [packages, setPackages] = useState<PackageItem[]>(fallbackData.packages as any || []);
-  const [testimonials, setTestimonials] = useState<TestimonialItem[]>(fallbackData.testimonials as any || []);
-  const [faqs, setFaqs] = useState<FAQItem[]>(fallbackData.faqs as any || []);
-  const [adminSession, setAdminSession] = useState<{ authenticated: boolean; email?: string; username?: string } | null>(null);
+  // Path navigation state
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [routeParams, setRouteParams] = useState<Record<string, string>>({});
+  
+  // Public/Admin data state - Default to built-in high-fidelity DEFAULT_STATE to prevent empty rendering while loading or on API failures (e.g. cookie checking redirects)
+  const [data, setData] = useState<Partial<DatabaseState> | null>(DEFAULT_STATE);
   const [loading, setLoading] = useState(true);
 
-  const fetchAllData = async () => {
-    try {
-      const [
-        settingsRes,
-        heroRes,
-        statsRes,
-        logosRes,
-        servicesRes,
-        whyRes,
-        categoriesRes,
-        portfolioRes,
-        processRes,
-        packagesRes,
-        testimonialsRes,
-        faqsRes
-      ] = await Promise.all([
-        safeFetchJson('/api/settings'),
-        safeFetchJson('/api/hero'),
-        safeFetchJson('/api/statistics'),
-        safeFetchJson('/api/client-logos'),
-        safeFetchJson('/api/services'),
-        safeFetchJson('/api/why-choose-us'),
-        safeFetchJson('/api/portfolio-categories'),
-        safeFetchJson('/api/portfolio'),
-        safeFetchJson('/api/work-process'),
-        safeFetchJson('/api/packages'),
-        safeFetchJson('/api/testimonials'),
-        safeFetchJson('/api/faqs')
-      ]);
+  // Authentication states - restored
+  const [token, setToken] = useState<string | null>(() => safeStorage.getItem('b2bfiy_token'));
+  const [adminEmail, setAdminEmail] = useState<string | null>(() => safeStorage.getItem('b2bfiy_email'));
+  const [isAdminVerified, setIsAdminVerified] = useState(() => {
+    return !!safeStorage.getItem('b2bfiy_token');
+  });
 
-      if (settingsRes) {
-        setSettings(settingsRes.settings);
-        setTopbar(settingsRes.topbar);
-        setHeader(settingsRes.header);
+
+  // Notifications
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
+
+  // Handle browser popstate (back/forward keys)
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Sync route parameters for dynamic slugs (e.g. /portfolio/[slug])
+  useEffect(() => {
+    const parts = currentPath.split('/').filter(Boolean);
+    if (parts[0] === 'portfolio' && parts[1]) {
+      setRouteParams({ slug: parts[1] });
+    } else {
+      setRouteParams({});
+    }
+  }, [currentPath]);
+
+  // Navigate utility with custom pushState
+  const navigateTo = (path: string) => {
+    window.history.pushState(null, '', path);
+    setCurrentPath(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Fetch standard public state
+  const refreshData = async () => {
+    try {
+      setLoading(true);
+      // Fetch either admin state or public state depending on credentials
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
-      if (heroRes) setHero(heroRes);
-      if (statsRes) setStatistics(statsRes);
-      if (logosRes) setClientLogos(logosRes);
-      if (servicesRes) setServices(servicesRes);
-      if (whyRes) setWhyChooseUs(whyRes);
-      if (categoriesRes) setPortfolioCategories(categoriesRes);
-      if (portfolioRes) setPortfolioProjects(portfolioRes);
-      if (processRes) setWorkProcess(processRes);
-      if (packagesRes) setPackages(packagesRes);
-      if (testimonialsRes) setTestimonials(testimonialsRes);
-      if (faqsRes) setFaqs(faqsRes);
+      
+      // Append cache-busting timestamp to prevent browser cache
+      const endpoint = token 
+        ? `/api/admin/state?t=${Date.now()}` 
+        : `/api/public/state?t=${Date.now()}`;
+        
+      const res = await fetch(endpoint, { headers });
+      if (res.ok) {
+        const payload = await res.json();
+        setData(payload);
+      } else {
+        // If admin fetch fails, fall back to public state
+        const publicRes = await fetch(`/api/public/state?t=${Date.now()}`);
+        if (publicRes.ok) {
+          const payload = await publicRes.json();
+          setData(payload);
+        }
+      }
     } catch (e) {
-      console.error('Error loading global site content:', e);
+      console.error("Failed to fetch state API", e);
     } finally {
       setLoading(false);
     }
   };
 
-  const checkAdminSession = async () => {
+  // Check admin verification
+  const verifyAdminToken = async (): Promise<boolean> => {
+    if (!token) {
+      setIsAdminVerified(false);
+      return false;
+    }
     try {
-      const res = await fetch('/api/auth/session');
-      const data = await res.json();
-      if (data && data.authenticated) {
-        setAdminSession({ authenticated: true, email: data.email, username: data.username });
+      const res = await fetch(`/api/auth/verify?t=${Date.now()}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        setIsAdminVerified(true);
+        return true;
       } else {
-        setAdminSession(null);
+        if (res.status === 401 || res.status === 403) {
+          safeStorage.removeItem('b2bfiy_token');
+          safeStorage.removeItem('b2bfiy_email');
+          setToken(null);
+          setAdminEmail(null);
+          setIsAdminVerified(false);
+        }
+        return false;
       }
     } catch (e) {
-      setAdminSession(null);
+      console.warn("[Auth Verify] Background verification network notice:", e);
+      return !!token;
     }
   };
 
+  // Trigger cache refresh on startup and token change
   useEffect(() => {
-    fetchAllData();
-    checkAdminSession();
-  }, []);
+    refreshData();
+    if (token) {
+      verifyAdminToken();
+    } else {
+      setIsAdminVerified(false);
+    }
+  }, [token]);
 
-  const refreshData = async () => {
-    await fetchAllData();
+  // Auth logins
+  const login = (authToken: string, email: string) => {
+    safeStorage.setItem('b2bfiy_token', authToken);
+    safeStorage.setItem('b2bfiy_email', email);
+    setToken(authToken);
+    setAdminEmail(email);
+    setIsAdminVerified(true);
+    showToast('Welcome back, Admin!', 'success');
+  };
+
+  // Auth logouts
+  const logout = async () => {
+    try {
+      if (token) {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      safeStorage.removeItem('b2bfiy_token');
+      safeStorage.removeItem('b2bfiy_email');
+      setToken(null);
+      setAdminEmail(null);
+      setIsAdminVerified(false);
+      navigateTo('/');
+      showToast('Logged out successfully', 'success');
+    }
+  };
+
+  // Toast notifier trigger
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast({ message: '', type: null });
+    }, 4000);
   };
 
   return (
-    <AppContext.Provider value={{
-      settings,
-      topbar,
-      header,
-      hero,
-      statistics,
-      clientLogos,
-      services,
-      whyChooseUs,
-      portfolioCategories,
-      portfolioProjects,
-      workProcess,
-      packages,
-      testimonials,
-      faqs,
-      adminSession,
-      setAdminSession,
-      loading,
-      refreshData,
-      checkAdminSession
-    }}>
+    <AppContext.Provider
+      value={{
+        currentPath,
+        navigateTo,
+        routeParams,
+        data,
+        loading,
+        refreshData,
+        token,
+        adminEmail,
+        login,
+        logout,
+        isAdminVerified,
+        verifyAdminToken,
+        toast,
+        showToast,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );
@@ -166,7 +246,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 export function useApp() {
   const context = useContext(AppContext);
   if (!context) {
-    throw new Error('useApp must be used within an AppProvider');
+    throw new Error('useApp must be used inside an AppProvider');
   }
   return context;
 }
