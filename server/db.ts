@@ -2,7 +2,11 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { DatabaseSchema } from '../src/types';
 
-const DB_FILE = path.join(process.cwd(), 'data.json');
+let DB_FILE = path.join(process.cwd(), 'data.json');
+
+if (process.env.VERCEL) {
+  DB_FILE = '/tmp/data.json';
+}
 
 // High-quality placeholder images for default seed data (all clean, copyright-free abstract SVGs or standard high-res free visuals)
 const DEFAULT_HERO_IMAGE = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80";
@@ -528,6 +532,20 @@ const DEFAULT_SEED: DatabaseSchema = {
 export class JSONDb {
   static async load(): Promise<DatabaseSchema> {
     try {
+      if (process.env.VERCEL) {
+        const tmpExists = await fs.access('/tmp/data.json').then(() => true).catch(() => false);
+        if (!tmpExists) {
+          const bundledPath = path.join(process.cwd(), 'data.json');
+          const bundledExists = await fs.access(bundledPath).then(() => true).catch(() => false);
+          if (bundledExists) {
+            const content = await fs.readFile(bundledPath, 'utf8');
+            await fs.writeFile('/tmp/data.json', content, 'utf8');
+          } else {
+            await fs.writeFile('/tmp/data.json', JSON.stringify(DEFAULT_SEED, null, 2), 'utf8');
+          }
+        }
+      }
+
       const exists = await fs.access(DB_FILE).then(() => true).catch(() => false);
       if (!exists) {
         await JSONDb.save(DEFAULT_SEED);
@@ -539,12 +557,25 @@ export class JSONDb {
       return { ...DEFAULT_SEED, ...data };
     } catch (e) {
       console.error('Failed to load JSON database, resetting to default seed...', e);
-      await JSONDb.save(DEFAULT_SEED);
+      try {
+        await JSONDb.save(DEFAULT_SEED);
+      } catch (err) {
+        console.error('Could not save default seed:', err);
+      }
       return DEFAULT_SEED;
     }
   }
 
   static async save(data: DatabaseSchema): Promise<void> {
-    await fs.writeFile(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    try {
+      await fs.writeFile(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    } catch (e) {
+      console.error('Failed to save JSON database:', e);
+      if (process.env.VERCEL) {
+        // Safe return instead of throwing on read-only systems like Vercel
+        return;
+      }
+      throw e;
+    }
   }
 }

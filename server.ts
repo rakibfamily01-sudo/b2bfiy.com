@@ -17,10 +17,36 @@ const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 fs.mkdir(UPLOADS_DIR, { recursive: true }).catch(console.error);
 app.use("/uploads", express.static(UPLOADS_DIR));
 
-// Simple In-Memory/Cookie Session token store for Admin Panel
-// In a real app we can use JWT, but a secure static token matching data.json credentials is perfect
-let ACTIVE_SESSIONS: Set<string> = new Set();
+import crypto from "crypto";
+
 const SESSION_COOKIE_NAME = "b2bfiy_session";
+const TOKEN_SECRET = "b2bfiy-agency-secret-key-1122"; // Secure signature secret for stateless tokens
+
+function generateToken(username: string): string {
+  const expires = Date.now() + 86400000; // 24 hours
+  const payload = JSON.stringify({ username, expires });
+  const signature = crypto.createHmac("sha256", TOKEN_SECRET).update(payload).digest("hex");
+  return Buffer.from(payload).toString("base64") + "." + signature;
+}
+
+function verifyToken(token: string): { username: string } | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 2) return null;
+    const payloadStr = Buffer.from(parts[0], "base64").toString("utf8");
+    const signature = parts[1];
+    
+    const expectedSignature = crypto.createHmac("sha256", TOKEN_SECRET).update(payloadStr).digest("hex");
+    if (signature !== expectedSignature) return null;
+    
+    const payload = JSON.parse(payloadStr);
+    if (payload.expires < Date.now()) return null;
+    
+    return { username: payload.username };
+  } catch (e) {
+    return null;
+  }
+}
 
 // Helper middleware to check if authenticated
 const requireAdmin = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -35,7 +61,8 @@ const requireAdmin = async (req: express.Request, res: express.Response, next: e
     token = cookies[SESSION_COOKIE_NAME];
   }
 
-  if (token && ACTIVE_SESSIONS.has(token)) {
+  const session = token ? verifyToken(token) : null;
+  if (session) {
     next();
   } else {
     res.status(401).json({ error: "Unauthorized access to CMS admin panel." });
@@ -56,8 +83,7 @@ app.post("/api/auth/login", async (req, res) => {
   const adminPassword = (db.settings as any).adminPassword || "rakib1122@#";
 
   if (loginId === adminEmail && password === adminPassword) {
-    const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    ACTIVE_SESSIONS.add(token);
+    const token = generateToken(adminEmail);
     
     // Set cookie and send back token
     res.cookie(SESSION_COOKIE_NAME, token, { httpOnly: true, maxAge: 86400000 }); // 24 Hours
@@ -79,7 +105,8 @@ app.get("/api/auth/session", async (req, res) => {
     token = cookies[SESSION_COOKIE_NAME];
   }
 
-  if (token && ACTIVE_SESSIONS.has(token)) {
+  const session = token ? verifyToken(token) : null;
+  if (session) {
     const db = await JSONDb.load();
     const adminEmail = (db.settings as any).adminEmail || "b2bfiy";
     res.json({ authenticated: true, email: adminEmail, username: adminEmail });
@@ -89,14 +116,6 @@ app.get("/api/auth/session", async (req, res) => {
 });
 
 app.post("/api/auth/logout", (req, res) => {
-  const cookieHeader = req.headers.cookie;
-  if (cookieHeader) {
-    const cookies = Object.fromEntries(cookieHeader.split(";").map(c => c.trim().split("=")));
-    const token = cookies[SESSION_COOKIE_NAME];
-    if (token) {
-      ACTIVE_SESSIONS.delete(token);
-    }
-  }
   res.clearCookie(SESSION_COOKIE_NAME);
   res.json({ success: true });
 });
