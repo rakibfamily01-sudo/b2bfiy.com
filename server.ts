@@ -513,8 +513,18 @@ app.delete("/api/media/:id", requireAdmin, async (req, res) => {
 });
 
 
+// Export app for serverless platforms like Vercel
+export default app;
+
 // Dynamic client-side assets serving / SPA Fallback setup
 async function startServer() {
+  if (process.env.VERCEL) {
+    // On Vercel, we don't start a standalone HTTP server or serve static assets here.
+    // Static assets are built into the dist folder and served natively by Vercel CDN,
+    // and api paths are routed here.
+    return;
+  }
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
