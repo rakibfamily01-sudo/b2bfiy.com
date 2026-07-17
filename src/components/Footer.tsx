@@ -45,7 +45,7 @@ export default function Footer() {
             )}
           </div>
           <p className="text-gray-400 text-sm leading-relaxed mt-2">
-            B2bfiy helps businesses build a powerful digital presence through high-converting websites, premium graphics, professional video clips, and comprehensive social media scaling.
+            {settings?.footerDescription || 'B2bfiy helps businesses build a powerful digital presence through high-converting websites, premium graphics, professional video clips, and comprehensive social media scaling.'}
           </p>
           {/* Socials Grid */}
           <div className="flex items-center gap-3.5 mt-4">
@@ -146,7 +146,7 @@ export default function Footer() {
 
       {/* Copy & Legal Links */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-        <p>© {new Date().getFullYear()} B2bfiy. All rights reserved.</p>
+        <p>{settings?.footerCopyright || `© ${new Date().getFullYear()} B2bfiy. All rights reserved.`}</p>
         <div className="flex items-center gap-6">
           <button onClick={() => handleNavClick('/privacy-policy')} className="hover:text-brand-pure-white transition-colors cursor-pointer">Privacy Policy</button>
           <button onClick={() => handleNavClick('/terms')} className="hover:text-brand-pure-white transition-colors cursor-pointer">Terms & Conditions</button>

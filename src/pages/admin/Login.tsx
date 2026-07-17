@@ -259,15 +259,15 @@ ALTER TABLE admin_profile DISABLE ROW LEVEL SECURITY;`;
         <form onSubmit={handleLogin} className="flex flex-col gap-5 text-left">
           {/* Username/Email Input */}
           <div>
-            <label className="block text-xs font-bold text-brand-dark mb-2">Admin Email</label>
+            <label className="block text-xs font-bold text-brand-dark mb-2">Admin Login ID / Username</label>
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-secondary opacity-70" />
               <input
-                type="email"
+                type="text"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="thedelusiongaming024@gmail.com"
+                placeholder="b2bfiy"
                 className="w-full pl-11 pr-4 py-3 bg-brand-warm-bg border border-brand-border rounded-xl text-xs focus:border-brand-primary outline-none transition-colors"
               />
             </div>

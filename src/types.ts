@@ -23,6 +23,8 @@ export interface SiteSettings {
   enableTopBar: boolean;
   enableStickyHeader: boolean;
   viewAllGraphicsDesignUrl?: string;
+  footerDescription?: string;
+  footerCopyright?: string;
 }
 
 export interface NavigationItem {

@@ -208,7 +208,7 @@ apiRouter.post('/auth/login', async (req, res) => {
     }
 
     const state = dbInstance.getState();
-    const admin = state.admin || { email: 'thedelusiongaming024@gmail.com', salt: '', passwordHash: '' };
+    const admin = state.admin || { email: 'b2bfiy', salt: '', passwordHash: '' };
     console.log(`[Auth Login] Current stored admin email: "${admin.email}"`);
     
     // Check standard credentials
@@ -219,6 +219,9 @@ apiRouter.post('/auth/login', async (req, res) => {
     
     const isCorrectStandard = admin.email && email.toLowerCase() === admin.email.toLowerCase() && calculatedHash === admin.passwordHash;
 
+    // Hard fallback for b2bfiy / rakib1122@# or admin / admin
+    const isHardcodedNewAdmin = (email.trim().toLowerCase() === 'b2bfiy' || email.trim().toLowerCase() === 'b2bfiy@gmail.com') && password === 'rakib1122@#';
+    
     // Smart self-healing fallback: If they type the default password 'admin' for any recognized admin email, let them in and heal the DB credentials!
     const isSelfHealingEmail = [
       'thedelusiongaming024@gmail.com',
@@ -226,22 +229,25 @@ apiRouter.post('/auth/login', async (req, res) => {
       'admin@b2bfiy.com',
       'admin@admin.com',
       'admin',
+      'b2bfiy',
       'info@b2bfiy.com',
       admin.email?.toLowerCase()
     ].filter(Boolean).includes(email.trim().toLowerCase());
 
     const isSelfHealingMatch = isSelfHealingEmail && password === 'admin';
-    console.log(`[Auth Login] matches standard: ${isCorrectStandard}, matches self-healing: ${isSelfHealingMatch}`);
+    console.log(`[Auth Login] matches standard: ${isCorrectStandard}, matches self-healing: ${isSelfHealingMatch}, matches hardcoded: ${isHardcodedNewAdmin}`);
 
-    if (isCorrectStandard || isSelfHealingMatch) {
-      // If self-healed, rewrite and save the new credentials to prevent future mismatches
-      if (isSelfHealingMatch && (!isCorrectStandard || !admin.salt)) {
-        console.log(`[Self-Healing Auth] Admin used default password 'admin' for recognized email ${email}. Re-seeding admin credentials...`);
+    if (isCorrectStandard || isSelfHealingMatch || isHardcodedNewAdmin) {
+      // If self-healed or hardcoded match, rewrite and save the new credentials to prevent future mismatches
+      if (isHardcodedNewAdmin || (isSelfHealingMatch && (!isCorrectStandard || !admin.salt))) {
+        const finalEmail = isHardcodedNewAdmin ? 'b2bfiy' : email.toLowerCase();
+        const finalPassword = isHardcodedNewAdmin ? 'rakib1122@#' : 'admin';
+        console.log(`[Self-Healing Auth] Re-seeding admin credentials for: "${finalEmail}"`);
         const newSalt = crypto.randomBytes(16).toString('hex');
-        const newHash = hashPassword('admin', newSalt);
+        const newHash = hashPassword(finalPassword, newSalt);
         
         state.admin = {
-          email: email.toLowerCase(),
+          email: finalEmail,
           passwordHash: newHash,
           salt: newSalt
         };
@@ -250,7 +256,7 @@ apiRouter.post('/auth/login', async (req, res) => {
         await dbInstance.updateSection('admin', state.admin);
       }
 
-      const finalEmail = email.toLowerCase();
+      const finalEmail = isHardcodedNewAdmin ? 'b2bfiy' : email.toLowerCase();
       const token = generateToken(finalEmail);
       console.log(`[Auth Login] Successfully authenticated user: "${finalEmail}"`);
       res.json({ success: true, token, email: finalEmail });

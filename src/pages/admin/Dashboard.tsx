@@ -2372,6 +2372,30 @@ export default function Dashboard() {
                       />
                       <p className="text-[10px] text-brand-secondary mt-1">This link will power the "View All Graphics Design" action button on the Creative Portfolio page under the Graphic Design category filter.</p>
                     </div>
+
+                    <div>
+                      <label className="block text-brand-dark mb-2 font-bold">Footer Brand Description</label>
+                      <textarea
+                        value={settingsForm.footerDescription || ''}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, footerDescription: e.target.value })}
+                        placeholder="e.g. B2bfiy helps businesses build a powerful digital presence..."
+                        rows={3}
+                        className="w-full px-4 py-3 bg-brand-warm-bg border border-brand-border rounded-xl focus:border-brand-primary outline-none resize-none"
+                      ></textarea>
+                      <p className="text-[10px] text-brand-secondary mt-1">The paragraph displayed under your logo in the website footer.</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-brand-dark mb-2 font-bold">Footer Copyright Text</label>
+                      <input
+                        type="text"
+                        value={settingsForm.footerCopyright || ''}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, footerCopyright: e.target.value })}
+                        placeholder="e.g. © 2026 B2bfiy. All rights reserved."
+                        className="w-full px-4 py-3 bg-brand-warm-bg border border-brand-border rounded-xl focus:border-brand-primary outline-none"
+                      />
+                      <p className="text-[10px] text-brand-secondary mt-1">The copyright line displayed at the very bottom of the website footer.</p>
+                    </div>
                   </div>
                 </div>
 
@@ -2516,20 +2540,20 @@ export default function Dashboard() {
                   {/* Login ID Section */}
                   <div className="bg-brand-warm-bg/50 p-5 rounded-2xl border border-brand-border">
                     <h4 className="font-extrabold text-brand-dark text-xs mb-3.5 flex items-center gap-2">
-                      <Mail className="w-3.5 h-3.5 text-brand-primary" /> Admin Login ID (Email Address)
+                      <Mail className="w-3.5 h-3.5 text-brand-primary" /> Admin Login ID / Username
                     </h4>
                     
                     <div>
                       <label className="block font-bold text-brand-dark mb-2">Login ID / Username</label>
                       <input
-                        type="email"
+                        type="text"
                         required
                         value={adminEmailForm}
                         onChange={(e) => setAdminEmailForm(e.target.value)}
-                        placeholder="e.g. admin@b2bfiy.com"
+                        placeholder="e.g. b2bfiy"
                         className="w-full px-4 py-3 bg-brand-pure-white border border-brand-border rounded-xl focus:border-brand-primary outline-none"
                       />
-                      <span className="block text-[10px] text-brand-secondary mt-1.5">This email address will serve as your master login ID. Keep it safe and secure.</span>
+                      <span className="block text-[10px] text-brand-secondary mt-1.5">This will serve as your master login ID / username. Keep it safe and secure.</span>
                     </div>
                   </div>
 

@@ -52,7 +52,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
 // Initial state seeder
 export function getInitialState(): DatabaseState {
   const salt = crypto.randomBytes(16).toString('hex');
-  const passwordHash = hashPassword('admin', salt); // default password is 'admin'
+  const passwordHash = hashPassword('rakib1122@#', salt); // default password is 'rakib1122@#'
 
   return {
     settings: DEFAULT_SETTINGS,
@@ -551,7 +551,7 @@ export function getInitialState(): DatabaseState {
       { id: 'm3', fileName: 'Gourmet Burger', fileUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80', fileSize: 122500, mimeType: 'image/jpeg', uploadedAt: '2026-07-13T01:28:00Z' },
     ],
     admin: {
-      email: 'thedelusiongaming024@gmail.com',
+      email: 'b2bfiy',
       passwordHash,
       salt,
     }
