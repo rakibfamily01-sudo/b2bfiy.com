@@ -38,7 +38,7 @@ export default function Login() {
       .then(data => {
         setDbStatus(data);
         if (data.adminEmail) {
-          setEmail(data.adminEmail);
+          setEmail(prev => prev ? prev : data.adminEmail);
         }
       })
       .catch(err => {

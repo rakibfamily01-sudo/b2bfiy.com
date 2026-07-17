@@ -3,13 +3,13 @@ import { DatabaseState, SiteSettings } from '../types';
 import { DEFAULT_STATE } from '../lib/defaultState';
 
 // Safe localStorage wrapper to prevent crashes inside sandboxed iframes
+const memoryStorage: Record<string, string> = {};
 const safeStorage = {
   getItem(key: string): string | null {
     try {
-      return localStorage.getItem(key);
+      return localStorage.getItem(key) || memoryStorage[key] || null;
     } catch (e) {
-      console.warn(`[SafeStorage] Failed to read ${key} from localStorage:`, e);
-      return null;
+      return memoryStorage[key] || null;
     }
   },
   setItem(key: string, value: string): void {
@@ -18,6 +18,7 @@ const safeStorage = {
     } catch (e) {
       console.warn(`[SafeStorage] Failed to write ${key} to localStorage:`, e);
     }
+    memoryStorage[key] = value;
   },
   removeItem(key: string): void {
     try {
@@ -25,6 +26,7 @@ const safeStorage = {
     } catch (e) {
       console.warn(`[SafeStorage] Failed to remove ${key} from localStorage:`, e);
     }
+    delete memoryStorage[key];
   }
 };
 
@@ -64,9 +66,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   // Authentication states
-  const [token, setToken] = useState<string | null>(safeStorage.getItem('b2bfiy_token'));
-  const [adminEmail, setAdminEmail] = useState<string | null>(safeStorage.getItem('b2bfiy_email'));
-  const [isAdminVerified, setIsAdminVerified] = useState(false);
+  const [token, setToken] = useState<string | null>(() => safeStorage.getItem('b2bfiy_token'));
+  const [adminEmail, setAdminEmail] = useState<string | null>(() => safeStorage.getItem('b2bfiy_email'));
+  const [isAdminVerified, setIsAdminVerified] = useState(() => {
+    return !!safeStorage.getItem('b2bfiy_token');
+  });
 
 
   // Notifications
@@ -148,16 +152,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setIsAdminVerified(true);
         return true;
       } else {
-        safeStorage.removeItem('b2bfiy_token');
-        safeStorage.removeItem('b2bfiy_email');
-        setToken(null);
-        setAdminEmail(null);
-        setIsAdminVerified(false);
+        // ONLY clear session if the server explicitly rejects authentication (e.g. 401/403)
+        // This prevents kicking out the user due to 502/503/504 proxy issues or serverless cold starts
+        if (res.status === 401 || res.status === 403) {
+          safeStorage.removeItem('b2bfiy_token');
+          safeStorage.removeItem('b2bfiy_email');
+          setToken(null);
+          setAdminEmail(null);
+          setIsAdminVerified(false);
+        }
         return false;
       }
     } catch (e) {
-      setIsAdminVerified(false);
-      return false;
+      // Network/fetch error (e.g. server restarting or slow connection) - DO NOT kick out the user
+      console.warn("[Auth Verify] Background verification network notice:", e);
+      return !!token;
     }
   };
 
