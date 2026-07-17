@@ -1,157 +1,157 @@
 {
   "settings": {
+    "logo": "/uploads/b2b_logo_png_png_1784184968221.png",
     "name": "B2bfiy",
-    "logo": "/logo.png",
-    "favicon": "/favicon.ico",
-    "phone": "+880 1712-345678",
     "email": "info@b2bfiy.com",
-    "whatsapp": "8801712345678",
+    "phone": "+880 1712-345678",
     "address": "Mirpur, Dhaka, Bangladesh",
-    "facebook": "https://facebook.com/b2bfiy",
-    "instagram": "https://instagram.com/b2bfiy",
-    "linkedin": "https://linkedin.com/company/b2bfiy",
+    "favicon": "/favicon.ico",
     "youtube": "https://youtube.com/@b2bfiy",
-    "defaultSeoTitle": "B2bfiy - Digital Creative & Growth Agency",
-    "defaultMetaDescription": "B2bfiy helps businesses build a powerful digital presence through high-converting websites, professional graphic design, engaging video content, and complete social media management.",
-    "googleAnalyticsId": "G-XXXXXXXXXX",
-    "facebookPixelId": "XXXXXXXXXXXXX",
+    "facebook": "https://facebook.com/b2bfiy",
+    "linkedin": "https://linkedin.com/company/b2bfiy",
+    "whatsapp": "8801712345678",
+    "instagram": "https://instagram.com/b2bfiy",
     "enableTopBar": true,
-    "enableStickyHeader": true
+    "defaultSeoTitle": "B2bfiy - Digital Creative & Growth Agency",
+    "facebookPixelId": "XXXXXXXXXXXXX",
+    "googleAnalyticsId": "G-XXXXXXXXXX",
+    "enableStickyHeader": true,
+    "defaultMetaDescription": "B2bfiy helps businesses build a powerful digital presence through high-converting websites, professional graphic design, engaging video content, and complete social media management."
   },
   "navigation_items": [
     {
       "id": "1",
-      "label": "Home",
       "url": "/",
+      "label": "Home",
       "order": 1
     },
     {
       "id": "2",
-      "label": "About Us",
       "url": "/about",
+      "label": "About Us",
       "order": 2
     },
     {
       "id": "3",
-      "label": "Services",
       "url": "/services",
+      "label": "Services",
       "order": 3
     },
     {
       "id": "4",
-      "label": "Portfolio",
       "url": "/portfolio",
+      "label": "Portfolio",
       "order": 4
     },
     {
       "id": "5",
-      "label": "Packages",
       "url": "/packages",
+      "label": "Packages",
       "order": 5
     },
     {
       "id": "6",
-      "label": "Free Audit",
       "url": "/free-audit",
+      "label": "Free Audit",
       "order": 6
     },
     {
       "id": "7",
-      "label": "Contact",
       "url": "/contact",
+      "label": "Contact",
       "order": 7
     }
   ],
   "hero_content": {
     "badge": "Your Digital Growth Partner",
     "heading": "Build a Powerful Digital Presence That Helps Your Business Grow.",
-    "highlightText": "Digital Presence",
-    "description": "From high-converting websites and professional graphic design to engaging video content and complete social media management — B2bfiy gives your business the digital support it needs to stand out and grow.",
-    "primaryCtaText": "Get a Free Consultation",
-    "primaryCtaUrl": "/free-audit",
-    "secondaryCtaText": "View Our Work",
-    "secondaryCtaUrl": "/portfolio",
-    "trustText": "One creative team for your complete digital presence.",
     "imagePath": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
-    "isVisible": true
+    "isVisible": true,
+    "trustText": "One creative team for your complete digital presence.",
+    "description": "From high-converting websites and professional graphic design to engaging video content and complete social media management — B2bfiy gives your business the digital support it needs to stand out and grow.",
+    "highlightText": "Digital Presence",
+    "primaryCtaUrl": "/free-audit",
+    "primaryCtaText": "Get a Free Consultation",
+    "secondaryCtaUrl": "/portfolio",
+    "secondaryCtaText": "View Our Work"
   },
   "statistics": [
     {
       "id": "s1",
       "label": "Projects Completed",
+      "order": 1,
       "value": "150+",
-      "iconName": "CheckCircle",
-      "order": 1
+      "iconName": "CheckCircle"
     },
     {
       "id": "s2",
       "label": "Happy Clients",
+      "order": 2,
       "value": "98%",
-      "iconName": "Users",
-      "order": 2
+      "iconName": "Users"
     },
     {
       "id": "s3",
       "label": "Years of Experience",
+      "order": 3,
       "value": "5+",
-      "iconName": "Calendar",
-      "order": 3
+      "iconName": "Calendar"
     },
     {
       "id": "s4",
       "label": "Client Retention Rate",
+      "order": 4,
       "value": "92%",
-      "iconName": "Award",
-      "order": 4
+      "iconName": "Award"
     }
   ],
   "client_logos": [
     {
       "id": "l1",
-      "name": "Apex Foods",
       "url": "#",
-      "imagePath": "https://images.unsplash.com/photo-1599305445671-ec2c6c64aae6?auto=format&fit=crop&w=150&q=80",
+      "name": "Apex Foods",
       "order": 1,
+      "imagePath": "https://images.unsplash.com/photo-1599305445671-ec2c6c64aae6?auto=format&fit=crop&w=150&q=80",
       "published": true
     },
     {
       "id": "l2",
-      "name": "Zylker Corp",
       "url": "#",
-      "imagePath": "https://images.unsplash.com/photo-1599305446868-59b861cfee4d?auto=format&fit=crop&w=150&q=80",
+      "name": "Zylker Corp",
       "order": 2,
+      "imagePath": "https://images.unsplash.com/photo-1599305446868-59b861cfee4d?auto=format&fit=crop&w=150&q=80",
       "published": true
     },
     {
       "id": "l3",
-      "name": "Dhaka Tech",
       "url": "#",
-      "imagePath": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=150&q=80",
+      "name": "Dhaka Tech",
       "order": 3,
+      "imagePath": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=150&q=80",
       "published": true
     },
     {
       "id": "l4",
-      "name": "Prime Hospital",
       "url": "#",
-      "imagePath": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=150&q=80",
+      "name": "Prime Hospital",
       "order": 4,
+      "imagePath": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=150&q=80",
       "published": true
     },
     {
       "id": "l5",
-      "name": "Global Retail",
       "url": "#",
-      "imagePath": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=150&q=80",
+      "name": "Global Retail",
       "order": 5,
+      "imagePath": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=150&q=80",
       "published": true
     }
   ],
   "services": [
     {
       "id": "ser1",
+      "order": 1,
       "title": "Website Development",
-      "description": "We build modern, fast, mobile-friendly websites designed to turn visitors into potential customers.",
       "features": [
         "Business Websites",
         "Landing Pages",
@@ -159,13 +159,13 @@
         "Custom Web Applications"
       ],
       "iconName": "Laptop",
-      "order": 1,
-      "published": true
+      "published": true,
+      "description": "We build modern, fast, mobile-friendly websites designed to turn visitors into potential customers."
     },
     {
       "id": "ser2",
+      "order": 2,
       "title": "Graphic Design",
-      "description": "Professional visual content that makes your brand look consistent, trustworthy, and memorable.",
       "features": [
         "Social Media Designs",
         "Branding & Logo Identity",
@@ -173,13 +173,13 @@
         "Promotional Materials"
       ],
       "iconName": "Palette",
-      "order": 2,
-      "published": true
+      "published": true,
+      "description": "Professional visual content that makes your brand look consistent, trustworthy, and memorable."
     },
     {
       "id": "ser3",
+      "order": 3,
       "title": "Video Editing",
-      "description": "Engaging video content designed to capture attention and communicate your message effectively.",
       "features": [
         "Reels & TikTok Shorts",
         "Promotional Videos",
@@ -187,13 +187,13 @@
         "Custom Motion Graphics"
       ],
       "iconName": "Video",
-      "order": 3,
-      "published": true
+      "published": true,
+      "description": "Engaging video content designed to capture attention and communicate your message effectively."
     },
     {
       "id": "ser4",
+      "order": 4,
       "title": "Social Media Management",
-      "description": "We manage your social media presence so you can focus on running your business.",
       "features": [
         "Content Strategy & Calendar",
         "Post Design & Styling",
@@ -201,52 +201,52 @@
         "Monthly Reporting & Analytics"
       ],
       "iconName": "Share2",
-      "order": 4,
-      "published": true
+      "published": true,
+      "description": "We manage your social media presence so you can focus on running your business."
     }
   ],
   "why_choose_us": [
     {
       "id": "w1",
+      "order": 1,
       "title": "One Team for Everything",
-      "description": "No need to hire separate freelancers. We handle your websites, graphics, videos, and social media under one roof.",
       "iconName": "ShieldCheck",
-      "order": 1
+      "description": "No need to hire separate freelancers. We handle your websites, graphics, videos, and social media under one roof."
     },
     {
       "id": "w2",
+      "order": 2,
       "title": "Custom Solutions",
-      "description": "We do not believe in boilerplate. Every design and campaign is custom-tailored to hit your specific business goals.",
       "iconName": "Sparkles",
-      "order": 2
+      "description": "We do not believe in boilerplate. Every design and campaign is custom-tailored to hit your specific business goals."
     },
     {
       "id": "w3",
+      "order": 3,
       "title": "Professional Quality",
-      "description": "Deliver premium standards with beautiful layouts, clean typography, engaging cuts, and solid responsive setups.",
       "iconName": "Award",
-      "order": 3
+      "description": "Deliver premium standards with beautiful layouts, clean typography, engaging cuts, and solid responsive setups."
     },
     {
       "id": "w4",
+      "order": 4,
       "title": "Fast Communication",
-      "description": "Dedicated account coordinators ensure you are always in the loop via WhatsApp and email, responding in minutes.",
       "iconName": "MessageSquareCode",
-      "order": 4
+      "description": "Dedicated account coordinators ensure you are always in the loop via WhatsApp and email, responding in minutes."
     },
     {
       "id": "w5",
+      "order": 5,
       "title": "Affordable Packages",
-      "description": "Flexible and transparent agency packages customized specifically for growing startups and local businesses.",
       "iconName": "BadgePercent",
-      "order": 5
+      "description": "Flexible and transparent agency packages customized specifically for growing startups and local businesses."
     },
     {
       "id": "w6",
+      "order": 6,
       "title": "Ongoing Growth Support",
-      "description": "We do not just hand over the assets. We constantly monitor performance, optimizing to scale up your leads and views.",
       "iconName": "TrendingUp",
-      "order": 6
+      "description": "We do not just hand over the assets. We constantly monitor performance, optimizing to scale up your leads and views."
     }
   ],
   "portfolio_categories": [
@@ -274,176 +274,176 @@
   "portfolio_projects": [
     {
       "id": "p1",
-      "slug": "health-first-clinic-portal",
-      "title": "HealthFirst Clinic Patient Portal",
-      "clientName": "HealthFirst Medical Group",
-      "categoryId": "cat1",
-      "serviceType": "Website Development",
-      "thumbnail": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=600&q=80",
-      "images": [
-        "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80"
-      ],
-      "videoUrl": "",
-      "websiteUrl": "https://healthfirst-demo.b2bfiy.com",
       "date": "2026-04-10",
-      "description": "A premium, highly secure patient registration and informational portal built to maximize client bookings.",
-      "challenge": "The clinic had an old slow website that was not responsive on mobile. Patients could not request appointments easily, resulting in hours of back-and-forth phone support.",
-      "solution": "Developed a ultra-fast, mobile-optimized Patient Booking website on React with automated appointment forms and clear services tables.",
-      "process": "1. Wireframed clinic services grid. 2. Tailored UI with deep off-whites and clinical cyan-blue tints. 3. Hooked up client-side scheduling widget.",
-      "result": "Clinic experienced a 45% increase in online appointment requests within the first 30 days of launch, cutting phone times in half.",
-      "technologies": [
-        "React",
-        "Tailwind CSS",
-        "Lucide React",
-        "FormKit"
-      ],
+      "slug": "health-first-clinic-portal",
       "tags": [
         "Healthcare",
         "Corporate",
         "Responsive"
       ],
+      "title": "HealthFirst Clinic Patient Portal",
+      "images": [
+        "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80"
+      ],
+      "result": "Clinic experienced a 45% increase in online appointment requests within the first 30 days of launch, cutting phone times in half.",
+      "process": "1. Wireframed clinic services grid. 2. Tailored UI with deep off-whites and clinical cyan-blue tints. 3. Hooked up client-side scheduling widget.",
       "featured": true,
-      "published": true
+      "solution": "Developed a ultra-fast, mobile-optimized Patient Booking website on React with automated appointment forms and clear services tables.",
+      "videoUrl": "",
+      "challenge": "The clinic had an old slow website that was not responsive on mobile. Patients could not request appointments easily, resulting in hours of back-and-forth phone support.",
+      "published": true,
+      "thumbnail": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=600&q=80",
+      "categoryId": "cat1",
+      "clientName": "HealthFirst Medical Group",
+      "websiteUrl": "https://healthfirst-demo.b2bfiy.com",
+      "description": "A premium, highly secure patient registration and informational portal built to maximize client bookings.",
+      "serviceType": "Website Development",
+      "technologies": [
+        "React",
+        "Tailwind CSS",
+        "Lucide React",
+        "FormKit"
+      ]
     },
     {
       "id": "p2",
-      "slug": "burger-nation-social-campaign",
-      "title": "BurgerNation Social Rebrand & Graphics",
-      "clientName": "BurgerNation BD",
-      "categoryId": "cat2",
-      "serviceType": "Graphic Design",
-      "thumbnail": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",
-      "images": [
-        "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=800&q=80"
-      ],
-      "videoUrl": "",
-      "websiteUrl": "",
       "date": "2026-05-18",
-      "description": "A complete culinary graphic rebranding and promotional menu design for social channels.",
-      "challenge": "BurgerNation wanted a high-quality visual style that contrasted with standard generic restaurant posters, highlighting their gourmet wood-fired beef patties.",
-      "solution": "Designed 15 highly stylized Instagram post templates and printable menus emphasizing high-contrast dark boards, dramatic golden smoke gradients, and punchy typography.",
-      "process": "We developed custom branding textures and tailored photographic alignments to give their burgers an premium, mouth-watering editorial feel.",
-      "result": "The rebranded posters generated 2.5x more comments and shares on Facebook and Instagram, boosting weekend takeaway traffic by 30%.",
-      "technologies": [
-        "Adobe Photoshop",
-        "Illustrator",
-        "Figma"
-      ],
+      "slug": "burger-nation-social-campaign",
       "tags": [
         "Branding",
         "Social Media",
         "Food & Beverage"
       ],
+      "title": "BurgerNation Social Rebrand & Graphics",
+      "images": [
+        "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=800&q=80"
+      ],
+      "result": "The rebranded posters generated 2.5x more comments and shares on Facebook and Instagram, boosting weekend takeaway traffic by 30%.",
+      "process": "We developed custom branding textures and tailored photographic alignments to give their burgers an premium, mouth-watering editorial feel.",
       "featured": true,
-      "published": true
+      "solution": "Designed 15 highly stylized Instagram post templates and printable menus emphasizing high-contrast dark boards, dramatic golden smoke gradients, and punchy typography.",
+      "videoUrl": "",
+      "challenge": "BurgerNation wanted a high-quality visual style that contrasted with standard generic restaurant posters, highlighting their gourmet wood-fired beef patties.",
+      "published": true,
+      "thumbnail": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",
+      "categoryId": "cat2",
+      "clientName": "BurgerNation BD",
+      "websiteUrl": "",
+      "description": "A complete culinary graphic rebranding and promotional menu design for social channels.",
+      "serviceType": "Graphic Design",
+      "technologies": [
+        "Adobe Photoshop",
+        "Illustrator",
+        "Figma"
+      ]
     },
     {
       "id": "p3",
-      "slug": "fintech-app-promo-video",
-      "title": "Fintech App Launch Promo Video",
-      "clientName": "CashFlow Bangladesh",
-      "categoryId": "cat3",
-      "serviceType": "Video Editing",
-      "thumbnail": "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=600&q=80",
-      "images": [
-        "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=800&q=80"
-      ],
-      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "websiteUrl": "",
       "date": "2026-06-05",
-      "description": "An engaging 45-second animated and real-action smartphone app promotional video with custom typography.",
-      "challenge": "CashFlow needed to introduce an easy peer-to-peer mobile transfer tool in a quick, eye-catching format suitable for TikTok, Reels, and YouTube Shorts.",
-      "solution": "Produced a fast-paced, high-energy 9:16 mobile format video containing dynamic text mockups, smooth UI transitions, and matching sound design.",
-      "process": "1. Drafted visual storyboard. 2. Recorded and edited mobile app screen flows. 3. Added professional motion graphics transitions, sound effects, and upbeat background music.",
-      "result": "The launch video accumulated over 120,000 views on Facebook Reels in two weeks, contributing directly to 8,000 application installs.",
-      "technologies": [
-        "Adobe Premiere Pro",
-        "After Effects",
-        "Audition"
-      ],
+      "slug": "fintech-app-promo-video",
       "tags": [
         "Video Production",
         "Shorts",
         "App Launch"
       ],
+      "title": "Fintech App Launch Promo Video",
+      "images": [
+        "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=800&q=80"
+      ],
+      "result": "The launch video accumulated over 120,000 views on Facebook Reels in two weeks, contributing directly to 8,000 application installs.",
+      "process": "1. Drafted visual storyboard. 2. Recorded and edited mobile app screen flows. 3. Added professional motion graphics transitions, sound effects, and upbeat background music.",
       "featured": true,
-      "published": true
+      "solution": "Produced a fast-paced, high-energy 9:16 mobile format video containing dynamic text mockups, smooth UI transitions, and matching sound design.",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "challenge": "CashFlow needed to introduce an easy peer-to-peer mobile transfer tool in a quick, eye-catching format suitable for TikTok, Reels, and YouTube Shorts.",
+      "published": true,
+      "thumbnail": "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=600&q=80",
+      "categoryId": "cat3",
+      "clientName": "CashFlow Bangladesh",
+      "websiteUrl": "",
+      "description": "An engaging 45-second animated and real-action smartphone app promotional video with custom typography.",
+      "serviceType": "Video Editing",
+      "technologies": [
+        "Adobe Premiere Pro",
+        "After Effects",
+        "Audition"
+      ]
     },
     {
       "id": "p4",
-      "slug": "solaria-energy-social-growth",
-      "title": "Solaria Solar Energy Campaign",
-      "clientName": "Solaria Power Ltd",
-      "categoryId": "cat4",
-      "serviceType": "Social Media Management",
-      "thumbnail": "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=600&q=80",
-      "images": [
-        "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=800&q=80"
-      ],
-      "videoUrl": "",
-      "websiteUrl": "",
       "date": "2026-06-25",
-      "description": "Complete monthly social media management comprising custom strategy, post layout, copy writing, and reporting.",
-      "challenge": "Solaria had low digital presence, which hindered sales reps when calling business leaders who had never heard of their solar panels.",
-      "solution": "Implemented a 30-day educational content calendar highlighting cost savings of clean solar infrastructure, establishing credibility and authority.",
-      "process": "Created a structural matrix mixing system highlights, real client testimonials, cost calculators, and environmental benefits charts with professional copy writing.",
-      "result": "Monthly account organic reach skyrocketed by 210%, with over 35 direct inbound message inquiries asking for corporate quotes.",
-      "technologies": [
-        "Figma",
-        "Buffer",
-        "Meta Business Suite"
-      ],
+      "slug": "solaria-energy-social-growth",
       "tags": [
         "B2B Marketing",
         "Organic Scale",
         "Sustainability"
       ],
+      "title": "Solaria Solar Energy Campaign",
+      "images": [
+        "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=800&q=80"
+      ],
+      "result": "Monthly account organic reach skyrocketed by 210%, with over 35 direct inbound message inquiries asking for corporate quotes.",
+      "process": "Created a structural matrix mixing system highlights, real client testimonials, cost calculators, and environmental benefits charts with professional copy writing.",
       "featured": false,
-      "published": true
+      "solution": "Implemented a 30-day educational content calendar highlighting cost savings of clean solar infrastructure, establishing credibility and authority.",
+      "videoUrl": "",
+      "challenge": "Solaria had low digital presence, which hindered sales reps when calling business leaders who had never heard of their solar panels.",
+      "published": true,
+      "thumbnail": "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=600&q=80",
+      "categoryId": "cat4",
+      "clientName": "Solaria Power Ltd",
+      "websiteUrl": "",
+      "description": "Complete monthly social media management comprising custom strategy, post layout, copy writing, and reporting.",
+      "serviceType": "Social Media Management",
+      "technologies": [
+        "Figma",
+        "Buffer",
+        "Meta Business Suite"
+      ]
     }
   ],
   "work_process": [
     {
       "id": "wp1",
-      "stepNumber": "01",
-      "title": "Discovery",
-      "description": "We start by deeply analyzing your business model, target market, competitors, and specific digital challenges.",
       "order": 1,
-      "published": true
+      "title": "Discovery",
+      "published": true,
+      "stepNumber": "01",
+      "description": "We start by deeply analyzing your business model, target market, competitors, and specific digital challenges."
     },
     {
       "id": "wp2",
-      "stepNumber": "02",
-      "title": "Strategy",
-      "description": "Our team crafts a precise, tailored growth plan outlining your content calendar, website blueprints, and video guidelines.",
       "order": 2,
-      "published": true
+      "title": "Strategy",
+      "published": true,
+      "stepNumber": "02",
+      "description": "Our team crafts a precise, tailored growth plan outlining your content calendar, website blueprints, and video guidelines."
     },
     {
       "id": "wp3",
-      "stepNumber": "03",
-      "title": "Create",
-      "description": "Our professional designers, editors, and web developers design high-converting assets customized to make you look premium.",
       "order": 3,
-      "published": true
+      "title": "Create",
+      "published": true,
+      "stepNumber": "03",
+      "description": "Our professional designers, editors, and web developers design high-converting assets customized to make you look premium."
     },
     {
       "id": "wp4",
-      "stepNumber": "04",
-      "title": "Launch",
-      "description": "With full optimization in place, we launch your web platforms and push high-engaging visual campaigns to your target audience.",
       "order": 4,
-      "published": true
+      "title": "Launch",
+      "published": true,
+      "stepNumber": "04",
+      "description": "With full optimization in place, we launch your web platforms and push high-engaging visual campaigns to your target audience."
     },
     {
       "id": "wp5",
-      "stepNumber": "05",
-      "title": "Support & Growth",
-      "description": "We track monthly views and leads, continually refining layouts and plans to scale your online customer base.",
       "order": 5,
-      "published": true
+      "title": "Support & Growth",
+      "published": true,
+      "stepNumber": "05",
+      "description": "We track monthly views and leads, continually refining layouts and plans to scale your online customer base."
     }
   ],
   "packages": [
@@ -451,9 +451,10 @@
       "id": "pkg1",
       "name": "Starter Plan",
       "type": "monthly",
+      "order": 1,
       "price": "12,000",
-      "currency": "৳",
       "period": "Month",
+      "currency": "৳",
       "features": [
         "12 Professional Social Media Designs",
         "4 Short-Form Videos / Reels",
@@ -464,17 +465,17 @@
         "Basic Page Optimization",
         "Monthly Performance Report"
       ],
-      "mostPopular": false,
-      "order": 1,
-      "published": true
+      "published": true,
+      "mostPopular": false
     },
     {
       "id": "pkg2",
       "name": "Growth Plan",
       "type": "monthly",
+      "order": 2,
       "price": "25,000",
-      "currency": "৳",
       "period": "Month",
+      "currency": "৳",
       "features": [
         "20 Professional Social Media Designs",
         "8 Short-Form Videos / Reels",
@@ -487,17 +488,17 @@
         "Monthly Performance Report",
         "Priority Support"
       ],
-      "mostPopular": true,
-      "order": 2,
-      "published": true
+      "published": true,
+      "mostPopular": true
     },
     {
       "id": "pkg3",
       "name": "Premium Growth",
       "type": "monthly",
+      "order": 3,
       "price": "45,000",
-      "currency": "৳",
       "period": "Month",
+      "currency": "৳",
       "features": [
         "30 Premium Social Media Designs",
         "12 Short-Form Videos / Reels",
@@ -512,18 +513,17 @@
         "Priority Support",
         "BONUS: Professional Business Landing Page"
       ],
-      "mostPopular": false,
-      "order": 3,
-      "published": true
+      "published": true,
+      "mostPopular": false
     },
     {
       "id": "pkg4",
       "name": "Starter Website",
       "type": "website",
+      "order": 4,
       "price": "15,000",
-      "currency": "৳",
       "period": "One-time",
-      "deliveryTime": "7-10 Business Days",
+      "currency": "৳",
       "features": [
         "Up to 5 Pages",
         "Modern Professional Design",
@@ -534,18 +534,18 @@
         "Social Media Links Integration",
         "SSL Certificate Setup Assistance"
       ],
+      "published": true,
       "mostPopular": false,
-      "order": 4,
-      "published": true
+      "deliveryTime": "7-10 Business Days"
     },
     {
       "id": "pkg5",
       "name": "Business Website",
       "type": "website",
+      "order": 5,
       "price": "30,000",
-      "currency": "৳",
       "period": "One-time",
-      "deliveryTime": "10-20 Business Days",
+      "currency": "৳",
       "features": [
         "Up to 10 Pages",
         "Premium Custom UI Design",
@@ -559,18 +559,18 @@
         "Admin Dashboard / CMS Guide",
         "30 Days Post-launch Support"
       ],
+      "published": true,
       "mostPopular": true,
-      "order": 5,
-      "published": true
+      "deliveryTime": "10-20 Business Days"
     },
     {
       "id": "pkg6",
       "name": "Custom / E-Commerce",
       "type": "website",
+      "order": 6,
       "price": "50,000",
-      "currency": "৳",
       "period": "One-time",
-      "deliveryTime": "20-30 Business Days",
+      "currency": "৳",
       "features": [
         "Custom Brand UI/UX Design",
         "Full Product Management Module",
@@ -584,34 +584,35 @@
         "Robust Security Configuration",
         "60 Days Dedicated Support"
       ],
+      "published": true,
       "mostPopular": false,
-      "order": 6,
-      "published": true
+      "deliveryTime": "20-30 Business Days"
     },
     {
       "id": "pkg7",
       "name": "Social Starter",
       "type": "graphic",
+      "order": 7,
       "price": "5,000",
-      "currency": "৳",
       "period": "One-time",
+      "currency": "৳",
       "features": [
         "10 High-Quality Social Media Designs",
         "Custom Consistent Brand Style",
         "2 Revisions Per Design Layout",
         "Figma/Source Files Provided"
       ],
-      "mostPopular": false,
-      "order": 7,
-      "published": true
+      "published": true,
+      "mostPopular": false
     },
     {
       "id": "pkg8",
       "name": "Business Content",
       "type": "graphic",
+      "order": 8,
       "price": "10,000",
-      "currency": "৳",
       "period": "One-time",
+      "currency": "৳",
       "features": [
         "20 High-Quality Social Media Designs",
         "Custom Tailored Brand Style",
@@ -619,17 +620,17 @@
         "Facebook Cover / Banner Designs",
         "Priority Delivery Turnaround"
       ],
-      "mostPopular": true,
-      "order": 8,
-      "published": true
+      "published": true,
+      "mostPopular": true
     },
     {
       "id": "pkg9",
       "name": "Monthly Design Partner",
       "type": "graphic",
+      "order": 9,
       "price": "18,000",
-      "currency": "৳",
       "period": "Month",
+      "currency": "৳",
       "features": [
         "Up to 30 Premium Designs",
         "Full Creative Marketing Support",
@@ -637,17 +638,17 @@
         "Uniform & Brand Consistent Style",
         "Priority Support on WhatsApp"
       ],
-      "mostPopular": false,
-      "order": 9,
-      "published": true
+      "published": true,
+      "mostPopular": false
     },
     {
       "id": "pkg10",
       "name": "Reels Starter",
       "type": "video",
+      "order": 10,
       "price": "6,000",
-      "currency": "৳",
       "period": "One-time",
+      "currency": "৳",
       "features": [
         "4 Short Videos / Reels",
         "Professional Fast Cut Editing",
@@ -655,17 +656,17 @@
         "Dynamic Transitions & Effects",
         "Trending Background Music Mix"
       ],
-      "mostPopular": false,
-      "order": 10,
-      "published": true
+      "published": true,
+      "mostPopular": false
     },
     {
       "id": "pkg11",
       "name": "Content Growth",
       "type": "video",
+      "order": 11,
       "price": "12,000",
-      "currency": "৳",
       "period": "One-time",
+      "currency": "৳",
       "features": [
         "8 Short Videos / Reels",
         "Professional Creative Editing",
@@ -673,17 +674,17 @@
         "Sound Design & Audio Cleaning",
         "Intro Motion Graphics Touches"
       ],
-      "mostPopular": true,
-      "order": 11,
-      "published": true
+      "published": true,
+      "mostPopular": true
     },
     {
       "id": "pkg12",
       "name": "Video Partner",
       "type": "video",
+      "order": 12,
       "price": "20,000",
-      "currency": "৳",
       "period": "Month",
+      "currency": "৳",
       "features": [
         "15 Short Videos / Reels",
         "Premium Storyboard Editing",
@@ -692,18 +693,17 @@
         "Premium Sound FX & Equalization",
         "Priority Deliveries and Revisions"
       ],
-      "mostPopular": false,
-      "order": 12,
-      "published": true
+      "published": true,
+      "mostPopular": false
     },
     {
       "id": "pkg13",
       "name": "Complete Launch Package",
       "type": "bundle",
+      "order": 13,
       "price": "75,000",
-      "currency": "৳",
       "period": "Package",
-      "deliveryTime": "20-30 Business Days",
+      "currency": "৳",
       "features": [
         "Professional Business Website (Up to 10 Pages)",
         "Complete Logo & Brand Identity Pack",
@@ -716,84 +716,84 @@
         "On-Page Local SEO Configuration",
         "30 Days Dedicated Launch Support"
       ],
+      "published": true,
       "mostPopular": true,
-      "order": 13,
-      "published": true
+      "deliveryTime": "20-30 Business Days"
     }
   ],
   "testimonials": [
     {
       "id": "t1",
       "name": "Kabir Ahmed",
-      "company": "Prime Fashion BD",
-      "review": "B2bfiy totally transformed our business page. The social post designs and promotional videos are extremely professional, and our daily inquiries have doubled!",
-      "rating": 5,
-      "photoPath": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
       "order": 1,
+      "rating": 5,
+      "review": "B2bfiy totally transformed our business page. The social post designs and promotional videos are extremely professional, and our daily inquiries have doubled!",
+      "company": "Prime Fashion BD",
+      "photoPath": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
       "published": true
     },
     {
       "id": "t2",
       "name": "Dr. Nusrat Jahan",
-      "company": "Smile Dentistry",
-      "review": "We are very happy with our clinic website designed by B2bfiy. It is fast, looks beautiful on phone screens, and lets patient book appointments with a click.",
-      "rating": 5,
-      "photoPath": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
       "order": 2,
+      "rating": 5,
+      "review": "We are very happy with our clinic website designed by B2bfiy. It is fast, looks beautiful on phone screens, and lets patient book appointments with a click.",
+      "company": "Smile Dentistry",
+      "photoPath": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
       "published": true
     },
     {
       "id": "t3",
       "name": "Rashedul Islam",
-      "company": "TechGear BD",
-      "review": "The video editing packages are the best deal we have ever found. They handle everything from trending audio to kinetic captions, making our reels viral!",
-      "rating": 5,
-      "photoPath": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
       "order": 3,
+      "rating": 5,
+      "review": "The video editing packages are the best deal we have ever found. They handle everything from trending audio to kinetic captions, making our reels viral!",
+      "company": "TechGear BD",
+      "photoPath": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
       "published": true
     }
   ],
   "faqs": [
     {
       "id": "f1",
-      "question": "How much does a project cost?",
-      "answer": "Our project costs depend on your requirements. We offer competitive individual and monthly packages for graphic design (starting from ৳5,000), video editing (from ৳6,000), websites (from ৳15,000), and full-scale social management (from ৳12,000/month). For complex portals, we provide custom quotes.",
       "order": 1,
+      "answer": "Our project costs depend on your requirements. We offer competitive individual and monthly packages for graphic design (starting from ৳5,000), video editing (from ৳6,000), websites (from ৳15,000), and full-scale social management (from ৳12,000/month). For complex portals, we provide custom quotes.",
+      "question": "How much does a project cost?",
       "published": true
     },
     {
       "id": "f2",
-      "question": "How long does website development take?",
-      "answer": "A basic landing page or starter website takes 7 to 10 business days. Premium business portals typically take 10 to 20 days, and large custom e-commerce or portal builds require 20 to 30 days.",
       "order": 2,
+      "answer": "A basic landing page or starter website takes 7 to 10 business days. Premium business portals typically take 10 to 20 days, and large custom e-commerce or portal builds require 20 to 30 days.",
+      "question": "How long does website development take?",
       "published": true
     },
     {
       "id": "f3",
-      "question": "Do you work with international clients?",
-      "answer": "Yes! We support businesses both locally in Bangladesh and internationally, organizing requirements seamlessly over WhatsApp, Zoom, and email.",
       "order": 3,
+      "answer": "Yes! We support businesses both locally in Bangladesh and internationally, organizing requirements seamlessly over WhatsApp, Zoom, and email.",
+      "question": "Do you work with international clients?",
       "published": true
     },
     {
       "id": "f4",
-      "question": "Can I request a custom package?",
-      "answer": "Absolutely. If our main plans do not match your exact needs, tell us what you want via the Contact form or a Free Audit request, and we will tailor a special plan for you.",
       "order": 4,
+      "answer": "Absolutely. If our main plans do not match your exact needs, tell us what you want via the Contact form or a Free Audit request, and we will tailor a special plan for you.",
+      "question": "Can I request a custom package?",
       "published": true
     },
     {
       "id": "f5",
-      "question": "Do you provide ongoing support?",
-      "answer": "Yes, we provide 30 to 60 days of post-launch maintenance for websites. Our monthly management clients get continuous 24/7 dedicated creative support on WhatsApp.",
       "order": 5,
+      "answer": "Yes, we provide 30 to 60 days of post-launch maintenance for websites. Our monthly management clients get continuous 24/7 dedicated creative support on WhatsApp.",
+      "question": "Do you provide ongoing support?",
       "published": true
     },
     {
       "id": "f6",
-      "question": "How do I get started?",
-      "answer": "You can get started instantly by applying for our Free Digital Audit, filling out our contact form, or clicking the WhatsApp button to chat directly with our coordinators!",
       "order": 6,
+      "answer": "You can get started instantly by applying for our Free Digital Audit, filling out our contact form, or clicking the WhatsApp button to chat directly with our coordinators!",
+      "question": "How do I get started?",
       "published": true
     }
   ],
@@ -802,32 +802,40 @@
   "media": [
     {
       "id": "m1",
-      "fileName": "Hero Office",
       "fileUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
+      "fileName": "Hero Office",
       "fileSize": 104230,
       "mimeType": "image/jpeg",
       "uploadedAt": "2026-07-13T01:28:00Z"
     },
     {
       "id": "m2",
-      "fileName": "Patient Booking",
       "fileUrl": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80",
+      "fileName": "Patient Booking",
       "fileSize": 85220,
       "mimeType": "image/jpeg",
       "uploadedAt": "2026-07-13T01:28:00Z"
     },
     {
       "id": "m3",
-      "fileName": "Gourmet Burger",
       "fileUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
+      "fileName": "Gourmet Burger",
       "fileSize": 122500,
       "mimeType": "image/jpeg",
       "uploadedAt": "2026-07-13T01:28:00Z"
+    },
+    {
+      "id": "media_1784184968221_34wmw",
+      "fileUrl": "/uploads/b2b_logo_png_png_1784184968221.png",
+      "fileName": "b2b logo png.png",
+      "fileSize": 118677,
+      "mimeType": "image/png",
+      "uploadedAt": "2026-07-16T06:56:08.221Z"
     }
   ],
   "admin": {
     "email": "b2bfiy",
-    "passwordHash": "c0861abfb3c0317d7790908aae2811e3afa075a14a71caec3509bc79fea90bf2152116bd39c1afa42b8f60f88fbaa7596587d53eb0b95348bf2bc8330c3ee2d1",
-    "salt": "cfe517a4347299dd7c21db5a3fbb4581"
+    "passwordHash": "2908c07a96b01c9d62fa2f4897f5f7ed787b52f29f3cb7c8bb4ab7aff3711d450d4289bffe4093e97842d47e8bc3e686be8237d5fb37d6703d516ebd7732c876",
+    "salt": "873d29901079855ce2b2a441b0b7b898"
   }
 }

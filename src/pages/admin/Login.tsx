@@ -76,6 +76,9 @@ export default function Login() {
         data = JSON.parse(text);
       } catch (parseErr) {
         console.error('Failed to parse response as JSON. Raw body:', text);
+        if (res.status >= 500) {
+          throw new Error(`The server is currently booting up or restarting (Status ${res.status}). Please try again in 5-10 seconds!`);
+        }
         throw new Error(`Invalid response from server (non-JSON).`);
       }
 
