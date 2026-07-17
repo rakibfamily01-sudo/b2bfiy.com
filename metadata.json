@@ -1,6 +1,6 @@
 {
   "name": "B2bfiy",
-  "description": "A complete, dynamic digital creative & growth agency website and secure CMS administration panel.",
+  "description": "A dynamic digital creative and growth agency website and CMS admin panel with portfolio, lead, and package management.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

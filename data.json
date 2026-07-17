@@ -1,0 +1,683 @@
+{
+  "settings": {
+    "name": "B2bfiy",
+    "logo": "B2bfiy",
+    "favicon": "",
+    "phone": "+8801700000000",
+    "email": "info.b2bfiy@gmail.com",
+    "whatsapp": "+8801700000000",
+    "address": "Dhaka, Bangladesh",
+    "facebook": "https://facebook.com/b2bfiy",
+    "instagram": "https://instagram.com/b2bfiy",
+    "linkedin": "https://linkedin.com/company/b2bfiy",
+    "youtube": "https://youtube.com/b2bfiy",
+    "defaultSeoTitle": "B2bfiy - Digital Agency for Creative & Growth Solutions",
+    "defaultSeoDescription": "We build high-converting websites, professional graphic designs, engaging video contents, and complete social media management to grow your business.",
+    "googleAnalyticsId": "",
+    "facebookPixelId": "",
+    "adminEmail": "b2bfiy",
+    "adminPassword": "rakib1122@#"
+  },
+  "topbar": {
+    "enabled": true,
+    "phone": "+880 1700 000000",
+    "email": "info.b2bfiy@gmail.com"
+  },
+  "header": {
+    "logo": "B2bfiy",
+    "ctaText": "Get a Free Audit",
+    "ctaUrl": "/free-audit",
+    "sticky": true
+  },
+  "hero": {
+    "badge": "Your Digital Growth Partner",
+    "heading": "Build a Powerful Digital Presence That Helps Your Business Grow.",
+    "highlightedText": "Digital Presence",
+    "description": "From high-converting websites and professional graphic design to engaging video content and complete social media management — B2bfiy provides full digital support essential to make your business stand out and grow.",
+    "primaryCtaText": "Get a Free Consultation",
+    "primaryCtaUrl": "/free-audit",
+    "secondaryCtaText": "View Our Work",
+    "secondaryCtaUrl": "/portfolio",
+    "trustText": "One creative team for your complete digital presence.",
+    "heroImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+    "visible": true
+  },
+  "statistics": [
+    {
+      "id": "1",
+      "label": "Completed Projects",
+      "value": "120+"
+    },
+    {
+      "id": "2",
+      "label": "Happy Clients",
+      "value": "80+"
+    },
+    {
+      "id": "3",
+      "label": "Years of Experience",
+      "value": "3+"
+    },
+    {
+      "id": "4",
+      "label": "Client Satisfaction",
+      "value": "99%"
+    }
+  ],
+  "clientLogos": [
+    {
+      "id": "logo-1",
+      "name": "Apex Tech",
+      "logoUrl": "",
+      "websiteUrl": "",
+      "published": true
+    },
+    {
+      "id": "logo-2",
+      "name": "Dhaka Bazaar",
+      "logoUrl": "",
+      "websiteUrl": "",
+      "published": true
+    },
+    {
+      "id": "logo-3",
+      "name": "Star Clinic",
+      "logoUrl": "",
+      "websiteUrl": "",
+      "published": true
+    },
+    {
+      "id": "logo-4",
+      "name": "Green Real Estate",
+      "logoUrl": "",
+      "websiteUrl": "",
+      "published": true
+    }
+  ],
+  "services": [
+    {
+      "id": "web-dev",
+      "title": "Website Development",
+      "description": "We build modern, fast, mobile-friendly websites that help convert visitors into paying customers.",
+      "icon": "laptop",
+      "features": [
+        "Business Website",
+        "Landing Page",
+        "E-commerce Website",
+        "Custom Web Solutions"
+      ],
+      "published": true
+    },
+    {
+      "id": "graphic-design",
+      "title": "Graphic Design",
+      "description": "Professional visual content that makes your brand consistent, credible, and memorable.",
+      "icon": "palette",
+      "features": [
+        "Social Media Design",
+        "Branding & Identity",
+        "Marketing Creatives",
+        "Promotional Design"
+      ],
+      "published": true
+    },
+    {
+      "id": "video-editing",
+      "title": "Video Editing",
+      "description": "Engaging video content designed to grab attention and deliver your message effectively.",
+      "icon": "video",
+      "features": [
+        "Reels & Shorts",
+        "Promotional Videos",
+        "Social Media Content",
+        "Motion Graphics"
+      ],
+      "published": true
+    },
+    {
+      "id": "social-media",
+      "title": "Social Media Management",
+      "description": "We manage your social media presence so you can focus entirely on running your business.",
+      "icon": "share2",
+      "features": [
+        "Content Planning",
+        "Post Designing",
+        "Captions & Hashtags",
+        "Page Management & Monthly Reporting"
+      ],
+      "published": true
+    }
+  ],
+  "whyChooseUs": [
+    {
+      "id": "w-1",
+      "title": "All-in-one Team",
+      "description": "Design, development, and marketing all under one roof.",
+      "icon": "users"
+    },
+    {
+      "id": "w-2",
+      "title": "Custom Solutions",
+      "description": "Personalized strategy tailored to your specific business type and goals.",
+      "icon": "sliders"
+    },
+    {
+      "id": "w-3",
+      "title": "Professional Quality",
+      "description": "Industry-standard modern designs and clean, high-quality code.",
+      "icon": "award"
+    },
+    {
+      "id": "w-4",
+      "title": "Fast Communication",
+      "description": "Quick responses and ongoing communication via WhatsApp and Email.",
+      "icon": "zap"
+    },
+    {
+      "id": "w-5",
+      "title": "Affordable Packages",
+      "description": "Premium digital services within reach for small and medium-sized businesses.",
+      "icon": "sparkles"
+    },
+    {
+      "id": "w-6",
+      "title": "Ongoing Support",
+      "description": "We stand by your side for technical support and maintenance after project completion.",
+      "icon": "shield-check"
+    }
+  ],
+  "portfolioCategories": [
+    {
+      "id": "c-1",
+      "name": "Website Development",
+      "slug": "website-development"
+    },
+    {
+      "id": "c-2",
+      "name": "Graphic Design",
+      "slug": "graphic-design"
+    },
+    {
+      "id": "c-3",
+      "name": "Video Editing",
+      "slug": "video-editing"
+    },
+    {
+      "id": "c-4",
+      "name": "Social Media Management",
+      "slug": "social-media-management"
+    }
+  ],
+  "portfolioProjects": [
+    {
+      "id": "proj-1",
+      "title": "E-Commerce Footwear Brand Website",
+      "slug": "ecommerce-footwear-brand-website",
+      "clientName": "FitStep BD",
+      "category": "website-development",
+      "serviceType": "E-commerce Web Development",
+      "featuredImage": "https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&w=800&q=80",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&w=800&q=80"
+      ],
+      "videoUrl": "",
+      "liveWebsiteUrl": "https://fitstep-example.b2bfiy.com",
+      "date": "2026-04-12",
+      "shortDescription": "A fully custom payment gateway integrated modern e-commerce site for a footwear brand.",
+      "fullDescription": "We developed a blazing fast e-commerce landing page and shopping portal for FitStep. It features a stunning product gallery, a custom cart, and a streamlined checkout system.",
+      "challenge": "Customers were abandoning their carts because the site was too slow when shopping from mobile devices.",
+      "solution": "We built a speed-optimized and mobile-first shopping experience using Next.js/React and Tailwind CSS, loading in under 1 second.",
+      "process": [
+        "Requirement Gathering & UI Draft Design",
+        "Mobile-first responsive frontend development",
+        "Integration of simplified cod-friendly checkout form",
+        "Performance optimization and lazy loading asset config"
+      ],
+      "results": "In the first month after launch, the bounce rate decreased by 35% and online sales increased by 42%.",
+      "tools": [
+        "React",
+        "Vite",
+        "Tailwind CSS",
+        "Express"
+      ],
+      "tags": [
+        "Ecommerce",
+        "Speed Optimized",
+        "Mobile First"
+      ],
+      "seoTitle": "FitStep E-Commerce Case Study - B2bfiy",
+      "seoDescription": "How B2bfiy developed a blazing fast e-commerce portal for FitStep BD boosting conversions by 42%.",
+      "featured": true,
+      "status": "published"
+    },
+    {
+      "id": "proj-2",
+      "title": "Social Media Brand Identity & Creatives",
+      "slug": "social-media-brand-identity-creatives",
+      "clientName": "Flavor Junction Restaurant",
+      "category": "graphic-design",
+      "serviceType": "Social Media Campaign Design",
+      "featuredImage": "https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=800&q=80",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=800&q=80"
+      ],
+      "videoUrl": "",
+      "liveWebsiteUrl": "",
+      "date": "2026-05-20",
+      "shortDescription": "Facebook & Instagram campaign post design and branding guidelines for a premium restaurant.",
+      "fullDescription": "A cohesive color palette and a series of attractive design templates were prepared for Flavor Junction, giving their social media pages a professional look.",
+      "challenge": "Previous posts were disorganized with no brand consistency, which was reducing customer trust.",
+      "solution": "We designed a luxury food branding guideline blending red and gold colors, and delivered over 20 custom social media graphic designs.",
+      "process": [
+        "Brand Identity Definition & Color Palette Selection",
+        "Social Media Post Template creation",
+        "Food photography retouching and banner design",
+        "High converting promotional offer design"
+      ],
+      "results": "Message inquiries on social pages and table bookings at the restaurant increased by 30%.",
+      "tools": [
+        "Adobe Photoshop",
+        "Adobe Illustrator",
+        "Figma"
+      ],
+      "tags": [
+        "Social Media",
+        "Branding",
+        "Restaurant Marketing"
+      ],
+      "seoTitle": "Flavor Junction Brand Identity Case Study - B2bfiy",
+      "seoDescription": "Consistent restaurant branding and social media graphic design case study by B2bfiy.",
+      "featured": true,
+      "status": "published"
+    },
+    {
+      "id": "proj-3",
+      "title": "High-Converting Facebook Ad Reels & Shorts",
+      "slug": "high-converting-facebook-ad-reels-shorts",
+      "clientName": "Skincare Essentials BD",
+      "category": "video-editing",
+      "serviceType": "Short-form Video Production",
+      "featuredImage": "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80",
+      "galleryImages": [
+        "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80"
+      ],
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "liveWebsiteUrl": "",
+      "date": "2026-06-05",
+      "shortDescription": "Creation of Reels and Shorts with engaging motion graphics and custom captions for Facebook ad campaigns.",
+      "fullDescription": "To boost product sales, we created 7 engaging short videos using 3-second hooks to capture user attention, paired with outstanding B-roll editing.",
+      "challenge": "Standard videos had low customer retention, and sales from Facebook ads were not meeting expectations.",
+      "solution": "We edited and optimized the ads with dynamic text animations, trending sound effects, and high-retention hook editing.",
+      "process": [
+        "Scriptwriting and Hook Optimization",
+        "Video editing with high retention sound effects",
+        "Dynamic animated captions & color grading",
+        "A/B testing different thumb versions"
+      ],
+      "results": "The ad ROI (Return on Investment) increased by 2.5x, and video view retention increased by 60%.",
+      "tools": [
+        "Premiere Pro",
+        "After Effects",
+        "CapCut Pro"
+      ],
+      "tags": [
+        "Video Editing",
+        "Facebook Ads",
+        "Reels",
+        "Shorts"
+      ],
+      "seoTitle": "Skincare Reels Ad Campaign Case Study - B2bfiy",
+      "seoDescription": "How short form viral video editing boosted Skincare Essentials sales and engagement.",
+      "featured": true,
+      "status": "published"
+    }
+  ],
+  "workProcess": [
+    {
+      "id": "wp-1",
+      "step": "01",
+      "title": "Discovery",
+      "description": "Conduct meetings and research to deeply understand your business, goals, and target audience.",
+      "visible": true
+    },
+    {
+      "id": "wp-2",
+      "step": "02",
+      "title": "Strategy",
+      "description": "Prepare a comprehensive roadmap and plan for design, content, and development.",
+      "visible": true
+    },
+    {
+      "id": "wp-3",
+      "step": "03",
+      "title": "Create",
+      "description": "Build solutions with professional quality design, engaging videos, and modern, clean code.",
+      "visible": true
+    },
+    {
+      "id": "wp-4",
+      "step": "04",
+      "title": "Launch",
+      "description": "Thoroughly test everything and deploy your service or website live to the public.",
+      "visible": true
+    },
+    {
+      "id": "wp-5",
+      "step": "05",
+      "title": "Support & Growth",
+      "description": "Provide ongoing monthly reporting, performance analysis, and continuous support to attract new customers.",
+      "visible": true
+    }
+  ],
+  "packages": [
+    {
+      "id": "pkg-1",
+      "name": "STARTER",
+      "price": "12,000",
+      "period": "/ month",
+      "features": [
+        "12 Professional Social Media Designs",
+        "4 Short-form Videos / Reels",
+        "Facebook Page Management",
+        "Content Planning & Design",
+        "Caption & Hashtag Research",
+        "Monthly Content Calendar",
+        "Basic Page Optimization",
+        "Monthly Performance Report"
+      ],
+      "ctaText": "Get Started",
+      "ctaUrl": "/free-audit?package=starter",
+      "isPopular": false,
+      "type": "monthly",
+      "published": true
+    },
+    {
+      "id": "pkg-2",
+      "name": "GROWTH",
+      "price": "25,000",
+      "period": "/ month",
+      "features": [
+        "20 Professional Social Media Designs",
+        "8 Short-form Videos / Reels",
+        "Facebook Page Management",
+        "Content Strategy & Custom Theme",
+        "Professional Captions & Hashtags",
+        "Monthly Content Calendar",
+        "Facebook Page Full Optimization",
+        "Basic Ad Campaign Setup",
+        "Monthly Performance Report",
+        "Priority Support"
+      ],
+      "ctaText": "Grow Your Business",
+      "ctaUrl": "/free-audit?package=growth",
+      "isPopular": true,
+      "type": "monthly",
+      "published": true
+    },
+    {
+      "id": "pkg-3",
+      "name": "PREMIUM GROWTH",
+      "price": "45,000",
+      "period": "/ month",
+      "features": [
+        "30 Premium Social Media Designs",
+        "12 Short-form Videos / Reels",
+        "Complete Facebook & Instagram Management",
+        "Content Strategy & Custom Theme",
+        "Professional Captions & Hashtags",
+        "Monthly Content Calendar",
+        "Facebook Page Optimization",
+        "Ad Campaign Setup & Management",
+        "Monthly Strategy Consultation",
+        "Detailed Performance Report",
+        "Priority VIP Support",
+        "Bonus: Professional Business Landing Page"
+      ],
+      "ctaText": "Book a Free Consultation",
+      "ctaUrl": "/free-audit?package=premium-growth",
+      "isPopular": false,
+      "type": "monthly",
+      "published": true
+    },
+    {
+      "id": "pkg-web-1",
+      "name": "STARTER WEBSITE",
+      "price": "15,000",
+      "period": " starting",
+      "features": [
+        "Up to 5 Pages",
+        "Modern Professional Design",
+        "Mobile & Tablet Responsive",
+        "Contact Form Integration",
+        "WhatsApp Direct Chat",
+        "Basic SEO Setup",
+        "Social Media Integration",
+        "Free SSL Setup Assistance"
+      ],
+      "ctaText": "Get Started Website",
+      "ctaUrl": "/free-audit?package=starter-website",
+      "isPopular": false,
+      "type": "website",
+      "deliveryTime": "7-10 Working Days",
+      "startingPrice": true,
+      "published": true
+    },
+    {
+      "id": "pkg-web-2",
+      "name": "BUSINESS WEBSITE",
+      "price": "30,000",
+      "period": " starting",
+      "features": [
+        "Up to 10 Pages",
+        "Premium Custom Design",
+        "Modern Dynamic Animations",
+        "100% Mobile & Tablet Responsive",
+        "Lead Generation Form",
+        "WhatsApp Direct Chat Integration",
+        "Advanced SEO Setup",
+        "Speed & Caching Optimization",
+        "Google Analytics Setup",
+        "Easy Admin Dashboard / CMS",
+        "30 Days Free Maintenance Support"
+      ],
+      "ctaText": "Choose Business Web",
+      "ctaUrl": "/free-audit?package=business-website",
+      "isPopular": true,
+      "type": "website",
+      "deliveryTime": "10-20 Working Days",
+      "startingPrice": true,
+      "published": true
+    },
+    {
+      "id": "pkg-web-3",
+      "name": "CUSTOM / E-COMMERCE WEBSITE",
+      "price": "50,000",
+      "period": " starting",
+      "features": [
+        "Custom Unlimited UI/UX Design",
+        "Easy Product Management & Upload",
+        "Modern Shopping Cart & Secure Checkout",
+        "Online Payment Gateway Integration (bKash/Nagad/Cards)",
+        "Customer Account Panel",
+        "Complete Order Management",
+        "Easy Admin Control Dashboard",
+        "Full SEO & Meta Configuration",
+        "Performance & Cache Tuning",
+        "High-grade Security Configuration",
+        "60 Days Full Maintenance Support"
+      ],
+      "ctaText": "Request a Custom Quote",
+      "ctaUrl": "/free-audit?package=ecommerce-custom",
+      "isPopular": false,
+      "type": "website",
+      "deliveryTime": "20-30 Working Days",
+      "startingPrice": true,
+      "published": true
+    },
+    {
+      "id": "pkg-g-1",
+      "name": "SOCIAL STARTER",
+      "price": "5,000",
+      "period": " (One-time)",
+      "features": [
+        "10 Social Media Designs",
+        "Custom Brand Colors & Style",
+        "Up to 2 Revisions per Design",
+        "HD Resolution JPG/PNG Delivery"
+      ],
+      "ctaText": "Order Social Starter",
+      "ctaUrl": "/free-audit?package=social-starter",
+      "isPopular": false,
+      "type": "graphic",
+      "published": true
+    },
+    {
+      "id": "pkg-g-2",
+      "name": "BUSINESS CONTENT",
+      "price": "10,000",
+      "period": " (One-time)",
+      "features": [
+        "20 Social Media Designs",
+        "Custom Brand Style Guide",
+        "Promotional Campaign Creatives",
+        "1 Profile Cover & Banner Design",
+        "Priority Fast Delivery",
+        "Free Revision Support"
+      ],
+      "ctaText": "Order Business Content",
+      "ctaUrl": "/free-audit?package=business-content",
+      "isPopular": true,
+      "type": "graphic",
+      "published": true
+    },
+    {
+      "id": "pkg-g-3",
+      "name": "MONTHLY DESIGN PARTNER",
+      "price": "18,000",
+      "period": "/ month",
+      "features": [
+        "Up to 30 Social Media Designs",
+        "All Types of Marketing Creatives & Banners",
+        "Promotional Campaign Design",
+        "Consistent Brand Style Guide",
+        "Priority Chat & Call Support",
+        "Unlimited Revisions"
+      ],
+      "ctaText": "Partner with Us",
+      "ctaUrl": "/free-audit?package=monthly-design-partner",
+      "isPopular": false,
+      "type": "graphic",
+      "published": true
+    },
+    {
+      "id": "pkg-v-1",
+      "name": "REELS STARTER",
+      "price": "6,000",
+      "period": " (One-time)",
+      "features": [
+        "4 Short Videos / Reels / Shorts",
+        "Professional Color & B-roll Editing",
+        "Animated Captions & Subtitles",
+        "Transitions & Modern Effects",
+        "Copyright-free Trendy Background Music"
+      ],
+      "ctaText": "Order Reels Starter",
+      "ctaUrl": "/free-audit?package=reels-starter",
+      "isPopular": false,
+      "type": "video",
+      "published": true
+    },
+    {
+      "id": "pkg-v-2",
+      "name": "CONTENT GROWTH",
+      "price": "12,000",
+      "period": " (One-time)",
+      "features": [
+        "8 Short Videos / Reels / Shorts",
+        "Professional High-quality Editing",
+        "Animated Bold Captions & Sound Effects",
+        "Sound Design & Noise Cancellation",
+        "Basic Motion Graphics & Stickers"
+      ],
+      "ctaText": "Order Content Growth",
+      "ctaUrl": "/free-audit?package=content-growth",
+      "isPopular": true,
+      "type": "video",
+      "published": true
+    },
+    {
+      "id": "pkg-v-3",
+      "name": "VIDEO PARTNER",
+      "price": "20,000",
+      "period": "/ month",
+      "features": [
+        "15 Short Videos / Reels / Shorts",
+        "Premium High-end Video Editing",
+        "Advanced Motion Graphics & Intro",
+        "Animated Eye-catching Captions",
+        "Sound Design & Studio Grade Sound",
+        "Priority Fast Delivery Support"
+      ],
+      "ctaText": "Partner for Video Content",
+      "ctaUrl": "/free-audit?package=video-partner",
+      "isPopular": false,
+      "type": "video",
+      "published": true
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "t-1",
+      "clientName": "MD Rakib Hossain",
+      "companyName": "FitStep BD Owner",
+      "review": "B2bfiy optimized our shoe e-commerce site's speed and social design. Their work quality is amazing and their customer response is extremely fast.",
+      "rating": 5,
+      "clientImage": "",
+      "published": true
+    },
+    {
+      "id": "t-2",
+      "clientName": "Farhana Akter",
+      "companyName": "Flavor Junction Manager",
+      "review": "Because of their custom social media design campaigns, our restaurant's customer bookings have increased significantly. Our branding now looks highly professional!",
+      "rating": 5,
+      "clientImage": "",
+      "published": true
+    }
+  ],
+  "faqs": [
+    {
+      "id": "f-1",
+      "question": "How much does a project cost?",
+      "answer": "We have specific, affordable packages for each of our services. Prices are determined based on the scope of development or service requested. For custom projects, we define the budget based on your requirements."
+    },
+    {
+      "id": "f-2",
+      "question": "How long does website development take?",
+      "answer": "Typically, a landing page or basic site takes 7-10 working days, and a dynamic, large e-commerce or business site is delivered within 10-20 working days."
+    },
+    {
+      "id": "f-3",
+      "question": "Do you work with international clients?",
+      "answer": "Yes, in addition to local businesses, we work with global marketplaces and provide remote custom solutions and support for clients from various countries."
+    },
+    {
+      "id": "f-4",
+      "question": "Can I request a custom package?",
+      "answer": "Absolutely! If your requirements are outside of our standard packages, you can contact us directly via the 'Request a Custom Quote' form or through WhatsApp to create a personalized package."
+    },
+    {
+      "id": "f-5",
+      "question": "Do you provide ongoing support?",
+      "answer": "Yes, even after a project goes live, we provide 30 to 60 days of completely free support and maintenance depending on the package. After that, monthly custom support packages are available at nominal rates."
+    },
+    {
+      "id": "f-6",
+      "question": "How do I get started?",
+      "answer": "Simply fill out the 'Get a Free Audit' form on our website or click the WhatsApp icon to start a direct consultation with our team."
+    }
+  ],
+  "auditRequests": [],
+  "contactMessages": [],
+  "media": []
+}

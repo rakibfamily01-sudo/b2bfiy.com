@@ -1,246 +1,146 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { DatabaseState, SiteSettings } from '../types';
-import { DEFAULT_STATE } from '../lib/defaultState';
+import { SiteSettings, TopBarSettings, HeaderSettings, HeroSettings, StatisticItem, ClientLogo, ServiceItem, WhyChooseUsItem, PortfolioCategory, PortfolioProject, WorkProcessStep, PackageItem, TestimonialItem, FAQItem } from '../types';
 
-// Safe localStorage wrapper to prevent crashes inside sandboxed iframes
-const memoryStorage: Record<string, string> = {};
-const safeStorage = {
-  getItem(key: string): string | null {
-    try {
-      return localStorage.getItem(key) || memoryStorage[key] || null;
-    } catch (e) {
-      return memoryStorage[key] || null;
-    }
-  },
-  setItem(key: string, value: string): void {
-    try {
-      localStorage.setItem(key, value);
-    } catch (e) {
-      console.warn(`[SafeStorage] Failed to write ${key} to localStorage:`, e);
-    }
-    memoryStorage[key] = value;
-  },
-  removeItem(key: string): void {
-    try {
-      localStorage.removeItem(key);
-    } catch (e) {
-      console.warn(`[SafeStorage] Failed to remove ${key} from localStorage:`, e);
-    }
-    delete memoryStorage[key];
-  }
-};
-
-interface AppContextType {
-  // Navigation & Routing
-  currentPath: string;
-  navigateTo: (path: string) => void;
-  routeParams: Record<string, string>;
-
-  // Public/CMS Data Cache
-  data: Partial<DatabaseState> | null;
+interface AppContextProps {
+  settings: SiteSettings | null;
+  topbar: TopBarSettings | null;
+  header: HeaderSettings | null;
+  hero: HeroSettings | null;
+  statistics: StatisticItem[];
+  clientLogos: ClientLogo[];
+  services: ServiceItem[];
+  whyChooseUs: WhyChooseUsItem[];
+  portfolioCategories: PortfolioCategory[];
+  portfolioProjects: PortfolioProject[];
+  workProcess: WorkProcessStep[];
+  packages: PackageItem[];
+  testimonials: TestimonialItem[];
+  faqs: FAQItem[];
+  adminSession: { authenticated: boolean; email?: string; username?: string } | null;
+  setAdminSession: React.Dispatch<React.SetStateAction<{ authenticated: boolean; email?: string; username?: string } | null>>;
   loading: boolean;
   refreshData: () => Promise<void>;
-
-  // Admin authentication
-  token: string | null;
-  adminEmail: string | null;
-  login: (token: string, email: string) => void;
-  logout: () => Promise<void>;
-  isAdminVerified: boolean;
-  verifyAdminToken: () => Promise<boolean>;
-
-  // Notification Toast Helpers
-  toast: { message: string; type: 'success' | 'error' | null };
-  showToast: (msg: string, type: 'success' | 'error') => void;
+  checkAdminSession: () => Promise<void>;
 }
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
+const AppContext = createContext<AppContextProps | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // Path navigation state
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [routeParams, setRouteParams] = useState<Record<string, string>>({});
-  
-  // Public/Admin data state - Default to built-in high-fidelity DEFAULT_STATE to prevent empty rendering while loading or on API failures (e.g. cookie checking redirects)
-  const [data, setData] = useState<Partial<DatabaseState> | null>(DEFAULT_STATE);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [topbar, setTopbar] = useState<TopBarSettings | null>(null);
+  const [header, setHeader] = useState<HeaderSettings | null>(null);
+  const [hero, setHero] = useState<HeroSettings | null>(null);
+  const [statistics, setStatistics] = useState<StatisticItem[]>([]);
+  const [clientLogos, setClientLogos] = useState<ClientLogo[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [whyChooseUs, setWhyChooseUs] = useState<WhyChooseUsItem[]>([]);
+  const [portfolioCategories, setPortfolioCategories] = useState<PortfolioCategory[]>([]);
+  const [portfolioProjects, setPortfolioProjects] = useState<PortfolioProject[]>([]);
+  const [workProcess, setWorkProcess] = useState<WorkProcessStep[]>([]);
+  const [packages, setPackages] = useState<PackageItem[]>([]);
+  const [testimonials, setTestimonials] = useState<TestimonialItem[]>([]);
+  const [faqs, setFaqs] = useState<FAQItem[]>([]);
+  const [adminSession, setAdminSession] = useState<{ authenticated: boolean; email?: string; username?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Authentication states
-  const [token, setToken] = useState<string | null>(() => safeStorage.getItem('b2bfiy_token'));
-  const [adminEmail, setAdminEmail] = useState<string | null>(() => safeStorage.getItem('b2bfiy_email'));
-  const [isAdminVerified, setIsAdminVerified] = useState(() => {
-    return !!safeStorage.getItem('b2bfiy_token');
-  });
-
-
-  // Notifications
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
-
-  // Handle browser popstate (back/forward keys)
-  useEffect(() => {
-    const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  // Sync route parameters for dynamic slugs (e.g. /portfolio/[slug])
-  useEffect(() => {
-    const parts = currentPath.split('/').filter(Boolean);
-    if (parts[0] === 'portfolio' && parts[1]) {
-      setRouteParams({ slug: parts[1] });
-    } else {
-      setRouteParams({});
-    }
-  }, [currentPath]);
-
-  // Navigate utility with custom pushState
-  const navigateTo = (path: string) => {
-    window.history.pushState(null, '', path);
-    setCurrentPath(path);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Fetch standard public state
-  const refreshData = async () => {
+  const fetchAllData = async () => {
     try {
-      setLoading(true);
-      // Fetch either admin state or public state depending on credentials
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      const [
+        settingsRes,
+        heroRes,
+        statsRes,
+        logosRes,
+        servicesRes,
+        whyRes,
+        categoriesRes,
+        portfolioRes,
+        processRes,
+        packagesRes,
+        testimonialsRes,
+        faqsRes
+      ] = await Promise.all([
+        fetch('/api/settings').then(r => r.json()),
+        fetch('/api/hero').then(r => r.json()),
+        fetch('/api/statistics').then(r => r.json()),
+        fetch('/api/client-logos').then(r => r.json()),
+        fetch('/api/services').then(r => r.json()),
+        fetch('/api/why-choose-us').then(r => r.json()),
+        fetch('/api/portfolio-categories').then(r => r.json()),
+        fetch('/api/portfolio').then(r => r.json()),
+        fetch('/api/work-process').then(r => r.json()),
+        fetch('/api/packages').then(r => r.json()),
+        fetch('/api/testimonials').then(r => r.json()),
+        fetch('/api/faqs').then(r => r.json())
+      ]);
+
+      if (settingsRes) {
+        setSettings(settingsRes.settings);
+        setTopbar(settingsRes.topbar);
+        setHeader(settingsRes.header);
       }
-      
-      // Append cache-busting timestamp to prevent browser cache
-      const endpoint = token 
-        ? `/api/admin/state?t=${Date.now()}` 
-        : `/api/public/state?t=${Date.now()}`;
-        
-      const res = await fetch(endpoint, { headers });
-      if (res.ok) {
-        const payload = await res.json();
-        setData(payload);
-      } else {
-        // If admin fetch fails, fall back to public state
-        const publicRes = await fetch(`/api/public/state?t=${Date.now()}`);
-        if (publicRes.ok) {
-          const payload = await publicRes.json();
-          setData(payload);
-        }
-      }
+      setHero(heroRes);
+      setStatistics(statsRes || []);
+      setClientLogos(logosRes || []);
+      setServices(servicesRes || []);
+      setWhyChooseUs(whyRes || []);
+      setPortfolioCategories(categoriesRes || []);
+      setPortfolioProjects(portfolioRes || []);
+      setWorkProcess(processRes || []);
+      setPackages(packagesRes || []);
+      setTestimonials(testimonialsRes || []);
+      setFaqs(faqsRes || []);
     } catch (e) {
-      console.error("Failed to fetch state API", e);
+      console.error('Error loading global site content:', e);
     } finally {
       setLoading(false);
     }
   };
 
-  // Check admin verification
-  const verifyAdminToken = async (): Promise<boolean> => {
-    if (!token) {
-      setIsAdminVerified(false);
-      return false;
-    }
+  const checkAdminSession = async () => {
     try {
-      const res = await fetch(`/api/auth/verify?t=${Date.now()}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (res.ok) {
-        setIsAdminVerified(true);
-        return true;
+      const res = await fetch('/api/auth/session');
+      const data = await res.json();
+      if (data && data.authenticated) {
+        setAdminSession({ authenticated: true, email: data.email, username: data.username });
       } else {
-        // ONLY clear session if the server explicitly rejects authentication (e.g. 401/403)
-        // This prevents kicking out the user due to 502/503/504 proxy issues or serverless cold starts
-        if (res.status === 401 || res.status === 403) {
-          safeStorage.removeItem('b2bfiy_token');
-          safeStorage.removeItem('b2bfiy_email');
-          setToken(null);
-          setAdminEmail(null);
-          setIsAdminVerified(false);
-        }
-        return false;
+        setAdminSession(null);
       }
     } catch (e) {
-      // Network/fetch error (e.g. server restarting or slow connection) - DO NOT kick out the user
-      console.warn("[Auth Verify] Background verification network notice:", e);
-      return !!token;
+      setAdminSession(null);
     }
   };
 
-  // Trigger cache refresh on startup and token change
   useEffect(() => {
-    refreshData();
-    if (token) {
-      verifyAdminToken();
-    } else {
-      setIsAdminVerified(false);
-    }
-  }, [token]);
+    fetchAllData();
+    checkAdminSession();
+  }, []);
 
-  // Auth logins
-  const login = (authToken: string, email: string) => {
-    safeStorage.setItem('b2bfiy_token', authToken);
-    safeStorage.setItem('b2bfiy_email', email);
-    setToken(authToken);
-    setAdminEmail(email);
-    setIsAdminVerified(true);
-    showToast('Welcome back, Admin!', 'success');
-  };
-
-  // Auth logouts
-  const logout = async () => {
-    try {
-      if (token) {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      safeStorage.removeItem('b2bfiy_token');
-      safeStorage.removeItem('b2bfiy_email');
-      setToken(null);
-      setAdminEmail(null);
-      setIsAdminVerified(false);
-      navigateTo('/admin/login');
-      showToast('Logged out successfully', 'success');
-    }
-  };
-
-  // Toast notifier trigger
-  const showToast = (message: string, type: 'success' | 'error') => {
-    setToast({ message, type });
-    setTimeout(() => {
-      setToast({ message: '', type: null });
-    }, 4000);
+  const refreshData = async () => {
+    await fetchAllData();
   };
 
   return (
-    <AppContext.Provider
-      value={{
-        currentPath,
-        navigateTo,
-        routeParams,
-        data,
-        loading,
-        refreshData,
-        token,
-        adminEmail,
-        login,
-        logout,
-        isAdminVerified,
-        verifyAdminToken,
-        toast,
-        showToast,
-      }}
-    >
+    <AppContext.Provider value={{
+      settings,
+      topbar,
+      header,
+      hero,
+      statistics,
+      clientLogos,
+      services,
+      whyChooseUs,
+      portfolioCategories,
+      portfolioProjects,
+      workProcess,
+      packages,
+      testimonials,
+      faqs,
+      adminSession,
+      setAdminSession,
+      loading,
+      refreshData,
+      checkAdminSession
+    }}>
       {children}
     </AppContext.Provider>
   );
@@ -249,7 +149,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 export function useApp() {
   const context = useContext(AppContext);
   if (!context) {
-    throw new Error('useApp must be used inside an AppProvider');
+    throw new Error('useApp must be used within an AppProvider');
   }
   return context;
 }

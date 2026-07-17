@@ -2,54 +2,36 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand Typography */
+  --color-primary: #FF2D2D;
+  --color-primary-coral: #FF5757;
+  --color-dark: #101828;
+  --color-muted: #475467;
+  --color-warm: #FFF7F5;
+  --color-light-sec: #FFF1EF;
+  --color-soft-red: #FFE8E5;
+  --color-warm-border: #F2E4E2;
+  
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-
-  /* Brand Colors */
-  --color-brand-primary: #FF2D2D;      /* Primary Red */
-  --color-brand-coral: #FF5757;        /* Coral Accent */
-  --color-brand-dark: #101828;         /* Deep Slate Navy Text */
-  --color-brand-secondary: #475467;    /* Secondary Charcoal Muted Text */
-  --color-brand-warm-bg: #FFF7F5;      /* Main Bright Warm Canvas BG */
-  --color-brand-light-bg: #FFF1EF;     /* Highlight Section Background */
-  --color-brand-pure-white: #FFFFFF;   /* Pure White */
-  --color-brand-border: #F2E4E2;       /* Light border */
-  --color-brand-soft-red: #FFE8E5;     /* Soft peach background */
-  --color-brand-success: #16A34A;      /* Success green */
-
-  /* UI Shadows */
-  --shadow-soft-card: 0 4px 30px rgba(16, 24, 40, 0.03);
-  --shadow-soft-hover: 0 10px 40px rgba(255, 45, 45, 0.08);
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-@layer base {
-  body {
-    font-family: var(--font-sans);
-    color: var(--color-brand-dark);
-    background-color: var(--color-brand-warm-bg);
-    overflow-x: hidden;
-  }
+body {
+  font-family: var(--font-sans);
+  color: var(--color-dark);
+  background-color: #FFFFFF;
 }
 
-/* Custom Utilities */
-.text-gradient {
-  background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-coral) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Smooth Scrollbar */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-brand-warm-bg);
+  background: #FFF7F5;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-brand-border);
+  background: #FFE8E5;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-brand-coral);
+  background: #FF5757;
 }
