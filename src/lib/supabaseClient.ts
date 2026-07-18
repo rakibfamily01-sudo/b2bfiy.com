@@ -1,16 +1,60 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Lead, SiteConfig } from '../types';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// Helper to get active URL
+export function getSupabaseUrl(): string {
+  return import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('b2bfiy_supabase_url') || '';
+}
 
-// Initialize Supabase Client ONLY if credentials are provided
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey) 
-  : null;
+// Helper to get active key
+export function getSupabaseAnonKey(): string {
+  return import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('b2bfiy_supabase_anon_key') || '';
+}
+
+let cachedClient: SupabaseClient | null = null;
+let cachedUrl = '';
+let cachedKey = '';
+
+// Dynamically return the client
+export function getSupabase(): SupabaseClient | null {
+  const url = getSupabaseUrl();
+  const key = getSupabaseAnonKey();
+
+  if (!url || !key) {
+    cachedClient = null;
+    return null;
+  }
+
+  if (url !== cachedUrl || key !== cachedKey || !cachedClient) {
+    try {
+      cachedUrl = url;
+      cachedKey = key;
+      cachedClient = createClient(url, key);
+    } catch (e) {
+      console.error('Failed to initialize Supabase client:', e);
+      return null;
+    }
+  }
+
+  return cachedClient;
+}
 
 export function isSupabaseConfigured(): boolean {
-  return !!supabase;
+  return !!getSupabase();
+}
+
+export function saveSupabaseCredentials(url: string, key: string) {
+  if (url && key) {
+    localStorage.setItem('b2bfiy_supabase_url', url.trim());
+    localStorage.setItem('b2bfiy_supabase_anon_key', key.trim());
+  } else {
+    localStorage.removeItem('b2bfiy_supabase_url');
+    localStorage.removeItem('b2bfiy_supabase_anon_key');
+  }
+  // Clear cache to trigger re-initialization
+  cachedClient = null;
+  cachedUrl = '';
+  cachedKey = '';
 }
 
 // Convert DB Lead (snake_case) to Frontend Lead (camelCase)
@@ -55,12 +99,13 @@ function mapLeadToDb(lead: Lead) {
  * FETCH ALL LEADS
  */
 export async function fetchLeads(fallbackLeads: Lead[]): Promise<{ data: Lead[]; source: 'supabase' | 'local'; error?: string }> {
-  if (!supabase) {
+  const client = getSupabase();
+  if (!client) {
     return { data: getLocalLeads(fallbackLeads), source: 'local' };
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('leads')
       .select('*')
       .order('created_at', { ascending: false });
@@ -97,12 +142,13 @@ export async function saveLead(lead: Lead): Promise<{ success: boolean; error?: 
   }
   localStorage.setItem('b2bfiy_leads_db', JSON.stringify(localLeads));
 
-  if (!supabase) {
+  const client = getSupabase();
+  if (!client) {
     return { success: true };
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await client
       .from('leads')
       .upsert(dbLead, { onConflict: 'id' });
 
@@ -123,12 +169,13 @@ export async function deleteLead(id: string): Promise<{ success: boolean; error?
   const filtered = localLeads.filter(l => l.id !== id);
   localStorage.setItem('b2bfiy_leads_db', JSON.stringify(filtered));
 
-  if (!supabase) {
+  const client = getSupabase();
+  if (!client) {
     return { success: true };
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await client
       .from('leads')
       .delete()
       .eq('id', id);
@@ -145,12 +192,13 @@ export async function deleteLead(id: string): Promise<{ success: boolean; error?
  * FETCH SITE CONFIG
  */
 export async function fetchSiteConfig(fallbackConfig: SiteConfig): Promise<{ data: SiteConfig; source: 'supabase' | 'local'; error?: string }> {
-  if (!supabase) {
+  const client = getSupabase();
+  if (!client) {
     return { data: getLocalSiteConfig(fallbackConfig), source: 'local' };
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('site_settings')
       .select('value')
       .eq('key', 'config')
@@ -190,12 +238,13 @@ export async function saveSiteConfig(config: SiteConfig): Promise<{ success: boo
   // Always update locally first
   localStorage.setItem('b2bfiy_site_config', JSON.stringify(config));
 
-  if (!supabase) {
+  const client = getSupabase();
+  if (!client) {
     return { success: true };
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await client
       .from('site_settings')
       .upsert({
         key: 'config',
@@ -295,28 +344,32 @@ export async function runSupabaseDiagnostics(): Promise<{
   errorSettingsRead?: string;
   errorSettingsWrite?: string;
 }> {
+  const url = getSupabaseUrl();
+  const key = getSupabaseAnonKey();
+  const client = getSupabase();
+
   const result = {
     success: false,
     canReadLeads: false,
     canWriteLeads: false,
     canReadSettings: false,
     canWriteSettings: false,
-    urlConfigured: !!supabaseUrl,
-    keyConfigured: !!supabaseAnonKey,
-    clientInitialized: !!supabase,
+    urlConfigured: !!url,
+    keyConfigured: !!key,
+    clientInitialized: !!client,
     errorLeadsRead: undefined as string | undefined,
     errorLeadsWrite: undefined as string | undefined,
     errorSettingsRead: undefined as string | undefined,
     errorSettingsWrite: undefined as string | undefined,
   };
 
-  if (!supabase) {
+  if (!client) {
     return result;
   }
 
   // 1. Test Leads Read
   try {
-    const { error } = await supabase.from('leads').select('id').limit(1);
+    const { error } = await client.from('leads').select('id').limit(1);
     if (error) {
       result.errorLeadsRead = `${error.code}: ${error.message}`;
     } else {
@@ -337,13 +390,13 @@ export async function runSupabaseDiagnostics(): Promise<{
       source: 'Diagnostics',
       created_at: new Date().toISOString()
     };
-    const { error: writeErr } = await supabase.from('leads').insert(testLead);
+    const { error: writeErr } = await client.from('leads').insert(testLead);
     if (writeErr) {
       result.errorLeadsWrite = `${writeErr.code}: ${writeErr.message}`;
     } else {
       result.canWriteLeads = true;
       // Cleanup immediately
-      await supabase.from('leads').delete().eq('id', testId);
+      await client.from('leads').delete().eq('id', testId);
     }
   } catch (err: any) {
     result.errorLeadsWrite = err.message || String(err);
@@ -351,7 +404,7 @@ export async function runSupabaseDiagnostics(): Promise<{
 
   // 3. Test Site Settings Read
   try {
-    const { error } = await supabase.from('site_settings').select('key').limit(1);
+    const { error } = await client.from('site_settings').select('key').limit(1);
     if (error) {
       result.errorSettingsRead = `${error.code}: ${error.message}`;
     } else {
@@ -364,7 +417,7 @@ export async function runSupabaseDiagnostics(): Promise<{
   // 4. Test Site Settings Write & Delete
   try {
     const testKey = 'diag_test_key_' + Date.now();
-    const { error: writeErr } = await supabase.from('site_settings').insert({
+    const { error: writeErr } = await client.from('site_settings').insert({
       key: testKey,
       value: { test: true },
       updated_at: new Date().toISOString()
@@ -374,7 +427,7 @@ export async function runSupabaseDiagnostics(): Promise<{
     } else {
       result.canWriteSettings = true;
       // Cleanup
-      await supabase.from('site_settings').delete().eq('key', testKey);
+      await client.from('site_settings').delete().eq('key', testKey);
     }
   } catch (err: any) {
     result.errorSettingsWrite = err.message || String(err);
@@ -383,4 +436,3 @@ export async function runSupabaseDiagnostics(): Promise<{
   result.success = result.canReadLeads && result.canWriteLeads && result.canReadSettings && result.canWriteSettings;
   return result;
 }
-

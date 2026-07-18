@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Lead, SiteConfig, PortfolioItem, ServicePackage, ServiceItem, WhyChooseUsReason, FAQItem, TestimonialItem } from '../types';
-import { getSQLSchema, runSupabaseDiagnostics } from '../lib/supabaseClient';
+import { getSQLSchema, runSupabaseDiagnostics, getSupabaseUrl, getSupabaseAnonKey, saveSupabaseCredentials } from '../lib/supabaseClient';
 import {
   Search, Filter, CheckCircle, FileSpreadsheet, Trash2, Phone, Mail,
   ExternalLink, MessageSquare, Sparkles, Calendar, Layers, Database,
@@ -100,6 +100,11 @@ export default function AdminPanel({
     errorSettingsWrite?: string;
   } | null>(null);
   const [diagRun, setDiagRun] = useState(false);
+
+  // Local states for Supabase credentials inputs
+  const [inputUrl, setInputUrl] = useState(getSupabaseUrl());
+  const [inputKey, setInputKey] = useState(getSupabaseAnonKey());
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'cleared'>('idle');
 
   // Function to run connection test
   const handleRunDiagnostics = async () => {
@@ -2488,6 +2493,96 @@ export default function AdminPanel({
                     <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20 flex items-center space-x-1.5 font-mono">
                       <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                       <span>LOCAL STORAGE FALLBACK</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* --- Supabase Instant credentials manager --- */}
+              <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4">
+                <div>
+                  <h4 className="text-sm font-bold text-white flex items-center space-x-2">
+                    <Database className="w-4 h-4 text-rose-400" />
+                    <span>Supabase Direct Integration (সরাসরি ডেটাবেজ কানেক্ট করুন)</span>
+                  </h4>
+                  <p className="text-xs text-gray-400 mt-1 bangla-text">
+                    নিচের ইনপুট বক্সে আপনার Supabase প্রোজেক্টের URL এবং Anon Key বসিয়ে <strong>"Connect & Sync"</strong> বাটনে ক্লিক করলেই ব্রাউজার ও লাইভ সাইট সরাসরি Supabase ডেটাবেজের সাথে কানেক্ট হয়ে যাবে। এনভায়রনমেন্ট ভেরিয়েবল ছাড়াই রিয়েল-টাইমে সেভ এবং কানেকশন টেস্ট করার সেরা উপায়!
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider font-mono">SUPABASE URL</label>
+                    <input
+                      type="text"
+                      value={inputUrl}
+                      onChange={(e) => setInputUrl(e.target.value)}
+                      placeholder="https://xxxxxxxxxxxxxxxxxxxx.supabase.co"
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-rose-500/50 transition-colors font-mono"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider font-mono">SUPABASE ANON KEY</label>
+                    <input
+                      type="password"
+                      value={inputKey}
+                      onChange={(e) => setInputKey(e.target.value)}
+                      placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-rose-500/50 transition-colors font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-1 items-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      saveSupabaseCredentials(inputUrl, inputKey);
+                      setSaveStatus('saved');
+                      setTimeout(() => setSaveStatus('idle'), 3000);
+                      // Run diagnostics test immediately
+                      handleRunDiagnostics();
+                      // Force a page/context status update
+                      if (typeof window !== 'undefined') {
+                        setTimeout(() => window.location.reload(), 1500);
+                      }
+                    }}
+                    className="px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold flex items-center space-x-1.5 shadow-lg shadow-rose-500/20 cursor-pointer transition-all"
+                  >
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    <span>Connect & Sync (কানেক্ট করুন)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      saveSupabaseCredentials('', '');
+                      setInputUrl('');
+                      setInputKey('');
+                      setSaveStatus('cleared');
+                      setDiagResult(null);
+                      setDiagRun(false);
+                      setTimeout(() => setSaveStatus('idle'), 3000);
+                      // Force update
+                      if (typeof window !== 'undefined') {
+                        setTimeout(() => window.location.reload(), 1500);
+                      }
+                    }}
+                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5 text-xs font-bold flex items-center space-x-1.5 cursor-pointer transition-all"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-gray-400" />
+                    <span>Disconnect (ডিসকানেক্ট)</span>
+                  </button>
+
+                  {saveStatus === 'saved' && (
+                    <span className="text-xs text-emerald-400 font-bold flex items-center animate-pulse bangla-text">
+                      ✓ সফলভাবে সেভ হয়েছে! পেজ রিলোড হচ্ছে...
+                    </span>
+                  )}
+                  {saveStatus === 'cleared' && (
+                    <span className="text-xs text-amber-400 font-bold flex items-center animate-pulse bangla-text">
+                      ✓ ক্রেডেনশিয়াল মুছে ফেলা হয়েছে। পেজ রিলোড হচ্ছে...
                     </span>
                   )}
                 </div>
