@@ -20,12 +20,23 @@ export default function Footer({ onToggleAdmin, isAdminMode, siteConfig }: Foote
           {/* Logo & Bio Column */}
           <div className="md:col-span-5 flex flex-col space-y-5">
             <a href="#home" className="flex items-center space-x-2 group self-start">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-agency-purple to-agency-pink flex items-center justify-center shadow-md">
-                <Rocket className="w-4.5 h-4.5 text-white" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-white font-display">
-                {branding.logoText || 'B2b'}<span className="text-agency-violet">{branding.logoHighlightText || 'fiy'}</span>
-              </span>
+              {branding.logoImageUrl ? (
+                <img
+                  src={branding.logoImageUrl}
+                  alt={branding.logoText || "B2bfiy"}
+                  referrerPolicy="no-referrer"
+                  className="h-8 w-auto object-contain max-w-[130px]"
+                />
+              ) : (
+                <>
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-agency-purple to-agency-pink flex items-center justify-center shadow-md">
+                    <Rocket className="w-4.5 h-4.5 text-white" />
+                  </div>
+                  <span className="text-xl font-bold tracking-tight text-white font-display">
+                    {branding.logoText || 'B2b'}<span className="text-agency-violet">{branding.logoHighlightText || 'fiy'}</span>
+                  </span>
+                </>
+              )}
             </a>
             <p className="text-sm leading-relaxed bangla-text max-w-sm">
               {footerData.aboutText || 'আমরা Website Development, Graphic Design, Video Editing এবং Facebook Management সার্ভিসের মাধ্যমে বাংলাদেশের ছোট ও মাঝারি ব্যবসাকে ডিজিটালি এগিয়ে নিতে সহায়তা করি।'}

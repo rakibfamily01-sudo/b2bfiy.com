@@ -216,8 +216,9 @@ export async function fetchSiteConfig(fallbackConfig: SiteConfig): Promise<{ dat
 
     if (data && data.value) {
       // Sync locally
-      localStorage.setItem('b2bfiy_site_config', JSON.stringify(data.value));
-      return { data: data.value as SiteConfig, source: 'supabase' };
+      const merged = mergeSiteConfig(data.value, fallbackConfig);
+      localStorage.setItem('b2bfiy_site_config', JSON.stringify(merged));
+      return { data: merged, source: 'supabase' };
     }
 
     return { data: getLocalSiteConfig(fallbackConfig), source: 'local' };
@@ -273,11 +274,63 @@ function getLocalLeads(fallback: Lead[]): Lead[] {
   return fallback;
 }
 
+export function mergeSiteConfig(loaded: any, fallback: SiteConfig): SiteConfig {
+  if (!loaded || typeof loaded !== 'object') return fallback;
+  return {
+    ...fallback,
+    ...loaded,
+    adminCredentials: {
+      ...fallback.adminCredentials,
+      ...(loaded.adminCredentials || {})
+    },
+    branding: {
+      ...fallback.branding,
+      ...(loaded.branding || {})
+    },
+    hero: {
+      ...fallback.hero,
+      ...(loaded.hero || {}),
+      stats: {
+        ...fallback.hero.stats,
+        ...(loaded.hero?.stats || {})
+      }
+    },
+    frictionAndCure: {
+      ...fallback.frictionAndCure,
+      ...(loaded.frictionAndCure || {})
+    },
+    whyChooseUs: {
+      ...fallback.whyChooseUs,
+      ...(loaded.whyChooseUs || {})
+    },
+    services: {
+      ...fallback.services,
+      ...(loaded.services || {})
+    },
+    portfolio: {
+      ...fallback.portfolio,
+      ...(loaded.portfolio || {})
+    },
+    packages: {
+      ...fallback.packages,
+      ...(loaded.packages || {})
+    },
+    testimonials: {
+      ...fallback.testimonials,
+      ...(loaded.testimonials || {})
+    },
+    footer: {
+      ...fallback.footer,
+      ...(loaded.footer || {})
+    }
+  };
+}
+
 function getLocalSiteConfig(fallback: SiteConfig): SiteConfig {
   const stored = localStorage.getItem('b2bfiy_site_config');
   if (stored) {
     try {
-      return JSON.parse(stored);
+      return mergeSiteConfig(JSON.parse(stored), fallback);
     } catch {
       return fallback;
     }

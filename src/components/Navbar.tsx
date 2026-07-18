@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Rocket, LayoutDashboard, Sparkles } from 'lucide-react';
+import { Menu, X, Rocket, LayoutDashboard, Sparkles, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface NavbarProps {
   onToggleAdmin: () => void;
@@ -9,12 +10,14 @@ interface NavbarProps {
     logoText: string;
     logoHighlightText: string;
     logoSubText: string;
+    logoImageUrl?: string;
   };
 }
 
 export default function Navbar({ onToggleAdmin, isAdminMode, branding }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,14 +28,14 @@ export default function Navbar({ onToggleAdmin, isAdminMode, branding }: NavbarP
   }, []);
 
   const navItems = [
-    { label: 'হোম', href: '#home' },
-    { label: 'সার্ভিসসমূহ', href: '#services' },
-    { label: 'কেন আমরা', href: '#why-us' },
-    { label: 'কাজসমূহ', href: '#portfolio' },
-    { label: 'প্যাকেজ', href: '#packages' },
-    { label: 'ফ্রি অডিট', href: '#free-audit' },
-    { label: 'যোগাযোগ', href: '#contact' },
-    { label: 'FAQ', href: '#faq' },
+    { label: t('nav_home'), href: '#home' },
+    { label: t('nav_services'), href: '#services' },
+    { label: t('nav_why_us'), href: '#why-us' },
+    { label: t('nav_portfolio'), href: '#portfolio' },
+    { label: t('nav_packages'), href: '#packages' },
+    { label: t('nav_free_audit'), href: '#free-audit' },
+    { label: t('nav_contact'), href: '#contact' },
+    { label: t('nav_faq'), href: '#faq' },
   ];
 
   return (
@@ -46,17 +49,28 @@ export default function Navbar({ onToggleAdmin, isAdminMode, branding }: NavbarP
         <div className="flex items-center justify-between">
           {/* Logo */}
           <a href="#home" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-agency-purple to-agency-pink flex items-center justify-center shadow-md shadow-agency-purple/25 group-hover:scale-105 transition-transform">
-              <Rocket className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight text-white font-display">
-                {branding.logoText || 'B2b'}<span className="text-agency-violet">{branding.logoHighlightText || 'fiy'}</span>
-              </span>
-              <span className="text-[9px] text-gray-400 uppercase tracking-widest font-mono">
-                {branding.logoSubText || 'Digital Partner'}
-              </span>
-            </div>
+            {branding.logoImageUrl ? (
+              <img
+                src={branding.logoImageUrl}
+                alt={branding.logoText || "B2bfiy"}
+                referrerPolicy="no-referrer"
+                className="h-9 w-auto object-contain max-w-[150px] group-hover:scale-102 transition-transform"
+              />
+            ) : (
+              <>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-agency-purple to-agency-pink flex items-center justify-center shadow-md shadow-agency-purple/25 group-hover:scale-105 transition-transform">
+                  <Rocket className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold tracking-tight text-white font-display">
+                    {branding.logoText || 'B2b'}<span className="text-agency-violet">{branding.logoHighlightText || 'fiy'}</span>
+                  </span>
+                  <span className="text-[9px] text-gray-400 uppercase tracking-widest font-mono">
+                    {branding.logoSubText || 'Digital Partner'}
+                  </span>
+                </div>
+              </>
+            )}
           </a>
 
           {/* Desktop Navigation */}
@@ -75,6 +89,30 @@ export default function Navbar({ onToggleAdmin, isAdminMode, branding }: NavbarP
 
             {/* CTA Actions */}
             <div className="flex items-center space-x-4">
+              {/* Language Switcher */}
+              <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1 text-[11px] font-bold">
+                <button
+                  onClick={() => setLanguage('bn')}
+                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+                    language === 'bn'
+                      ? 'bg-gradient-to-r from-agency-purple to-agency-pink text-white shadow-sm'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  বাং
+                </button>
+                <button
+                  onClick={() => setLanguage('en')}
+                  className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+                    language === 'en'
+                      ? 'bg-gradient-to-r from-agency-purple to-agency-pink text-white shadow-sm'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  EN
+                </button>
+              </div>
+
               <button
                 id="btn-admin-nav"
                 onClick={onToggleAdmin}
@@ -85,24 +123,47 @@ export default function Navbar({ onToggleAdmin, isAdminMode, branding }: NavbarP
                 }`}
               >
                 <LayoutDashboard className="w-3.5 h-3.5" />
-                <span>{isAdminMode ? 'Landing Page' : 'Admin Panel'}</span>
+                <span>{isAdminMode ? t('nav_landing_page') : t('nav_admin_panel')}</span>
               </button>
 
               <a
                 id="cta-nav-button"
                 href="#free-audit"
-                className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-xs font-semibold text-white rounded-lg group bg-gradient-to-br from-agency-purple to-agency-pink group-hover:from-agency-purple group-hover:to-agency-pink hover:text-white focus:ring-4 focus:outline-none focus:ring-purple-800"
-                style={{ marginBottom: 0, marginRight: 0 }}
+                className="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-semibold text-white rounded-lg group bg-gradient-to-br from-agency-purple to-agency-pink group-hover:from-agency-purple group-hover:to-agency-pink hover:text-white focus:ring-4 focus:outline-none focus:ring-purple-800"
               >
                 <span className="relative px-4 py-2 transition-all ease-in duration-75 bg-[#05070c] rounded-md group-hover:bg-opacity-0">
-                  ফ্রি অডিট নিন
+                  {t('nav_get_free_audit')}
                 </span>
               </a>
             </div>
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu and Language switcher button */}
           <div className="lg:hidden flex items-center space-x-2">
+            {/* Language Switcher for Mobile */}
+            <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1 text-[10px] font-bold mr-1">
+              <button
+                onClick={() => setLanguage('bn')}
+                className={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${
+                  language === 'bn'
+                    ? 'bg-gradient-to-r from-agency-purple to-agency-pink text-white shadow-sm'
+                    : 'text-gray-400'
+                }`}
+              >
+                বাং
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${
+                  language === 'en'
+                    ? 'bg-gradient-to-r from-agency-purple to-agency-pink text-white shadow-sm'
+                    : 'text-gray-400'
+                }`}
+              >
+                EN
+              </button>
+            </div>
+
             <button
               id="mobile-admin-toggle"
               onClick={onToggleAdmin}
@@ -152,7 +213,7 @@ export default function Navbar({ onToggleAdmin, isAdminMode, branding }: NavbarP
                   className="flex items-center justify-center space-x-2 px-4 py-3 rounded-lg text-sm font-semibold bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  <span>{isAdminMode ? 'Landing Page-এ ফিরে যান' : 'Admin Panel (English)'}</span>
+                  <span>{isAdminMode ? t('nav_landing_page') : t('nav_admin_panel')}</span>
                 </button>
                 <a
                   id="mobile-cta-action"
@@ -161,7 +222,7 @@ export default function Navbar({ onToggleAdmin, isAdminMode, branding }: NavbarP
                   className="flex items-center justify-center space-x-1.5 px-4 py-3 rounded-lg text-sm font-semibold bg-gradient-to-r from-agency-purple to-agency-pink text-white shadow-lg"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>ফ্রি অডিট নিন</span>
+                  <span>{t('nav_get_free_audit')}</span>
                 </a>
               </div>
             </div>
@@ -171,3 +232,4 @@ export default function Navbar({ onToggleAdmin, isAdminMode, branding }: NavbarP
     </nav>
   );
 }
+

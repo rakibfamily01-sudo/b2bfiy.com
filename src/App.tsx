@@ -13,10 +13,15 @@ import FAQ from './components/FAQ';
 import CTA from './components/CTA';
 import Footer from './components/Footer';
 import AdminPanel from './components/AdminPanel';
+import WhatsAppWidget from './components/WhatsAppWidget';
+import ScrollToTop from './components/ScrollToTop';
+import { SuccessModal, SuccessToast } from './components/SuccessFeedback';
 import { initialLeads, defaultSiteConfig } from './data';
 import { Lead, ServicePackage, SiteConfig } from './types';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldCheck, Sparkles, LayoutDashboard } from 'lucide-react';
+import { useLanguage } from './context/LanguageContext';
+import { getTranslatedConfig } from './translations';
 import { 
   isSupabaseConfigured, 
   fetchLeads, 
@@ -26,12 +31,31 @@ import {
   saveSiteConfig 
 } from './lib/supabaseClient';
 
+const sectionVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.8, 
+      ease: [0.16, 1, 0.3, 1] 
+    } 
+  }
+};
+
 export default function App() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [siteConfig, setSiteConfig] = useState<SiteConfig>(defaultSiteConfig);
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [selectedService, setSelectedService] = useState('');
+  const { language } = useLanguage();
+  const [successFeedback, setSuccessFeedback] = useState<{
+    isOpen: boolean;
+    type: 'audit' | 'contact';
+    name: string;
+  } | null>(null);
   const [dbStatus, setDbStatus] = useState<{
+
     configured: boolean;
     connected: boolean;
     source: 'supabase' | 'local';
@@ -107,6 +131,13 @@ export default function App() {
     if (!res.success) {
       console.warn('Could not save lead to Supabase, saved locally:', res.error);
     }
+
+    // Trigger visual feedback modal/toast
+    setSuccessFeedback({
+      isOpen: true,
+      type: newLeadData.source === 'Free Audit' ? 'audit' : 'contact',
+      name: newLeadData.name
+    });
   };
 
   // 3. Update Lead Status
@@ -206,12 +237,14 @@ export default function App() {
     }, 100);
   };
 
+  const displaySiteConfig = getTranslatedConfig(siteConfig, language);
+
   return (
     <div className="relative min-h-screen bg-[#05070c] text-white">
 
 
       {/* Floating Header Navbar */}
-      <Navbar onToggleAdmin={() => setIsAdminMode(!isAdminMode)} isAdminMode={isAdminMode} branding={siteConfig.branding} />
+      <Navbar onToggleAdmin={() => setIsAdminMode(!isAdminMode)} isAdminMode={isAdminMode} branding={displaySiteConfig.branding} />
 
       <AnimatePresence mode="wait">
         {isAdminMode ? (
@@ -243,49 +276,150 @@ export default function App() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* 1. Hero banner */}
-            <Hero heroConfig={siteConfig.hero} branding={siteConfig.branding} />
+            {/* 1. Hero banner (Fades and slides up instantly on load for great UX) */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={sectionVariants}
+            >
+              <Hero heroConfig={displaySiteConfig.hero} branding={displaySiteConfig.branding} />
+            </motion.div>
 
             {/* 2. Core Services */}
-            <Services onSelectService={handleSelectService} servicesConfig={siteConfig.services} />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <Services onSelectService={handleSelectService} servicesConfig={displaySiteConfig.services} />
+            </motion.div>
 
             {/* 3. Why Choose B2bfiy */}
-            <WhyChooseUs whyChooseUsConfig={siteConfig.whyChooseUs} />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <WhyChooseUs whyChooseUsConfig={displaySiteConfig.whyChooseUs} />
+            </motion.div>
 
             {/* Comparison of Pain & Cure */}
-            <FrictionAndCure data={siteConfig.frictionAndCure} onCtaClick={scrollToContact} />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <FrictionAndCure data={displaySiteConfig.frictionAndCure} onCtaClick={scrollToContact} />
+            </motion.div>
 
             {/* 4. Filterable Projects */}
-            <Portfolio portfolioConfig={siteConfig.portfolio} />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <Portfolio portfolioConfig={displaySiteConfig.portfolio} />
+            </motion.div>
 
             {/* 5. Pricing Tiers */}
-            <Packages onSelectPackage={handleSelectPackage} packagesConfig={siteConfig.packages} />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <Packages onSelectPackage={handleSelectPackage} packagesConfig={displaySiteConfig.packages} />
+            </motion.div>
 
             {/* Client Success Stories */}
-            <Testimonials testimonialsConfig={siteConfig.testimonials} />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <Testimonials testimonialsConfig={displaySiteConfig.testimonials} />
+            </motion.div>
 
             {/* 6. Free Audit Widget */}
-            <FreeAudit onAddLead={handleAddLead} />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <FreeAudit onAddLead={handleAddLead} />
+            </motion.div>
 
             {/* 7. Conversion Contact Form */}
-            <Contact
-              selectedService={selectedService}
-              onAddLead={handleAddLead}
-              resetSelection={() => setSelectedService('')}
-              siteConfig={siteConfig}
-            />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <Contact
+                selectedService={selectedService}
+                onAddLead={handleAddLead}
+                resetSelection={() => setSelectedService('')}
+                siteConfig={displaySiteConfig}
+              />
+            </motion.div>
 
             {/* 8. Collapsible Accordion FAQs */}
-            <FAQ faqs={siteConfig.faqs} />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <FAQ faqs={displaySiteConfig.faqs} />
+            </motion.div>
 
             {/* 9. Final CTA */}
-            <CTA siteConfig={siteConfig} />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.05 }}
+              variants={sectionVariants}
+            >
+              <CTA siteConfig={displaySiteConfig} />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Corporate Foot footer */}
-      <Footer onToggleAdmin={() => setIsAdminMode(!isAdminMode)} isAdminMode={isAdminMode} siteConfig={siteConfig} />
+      <Footer onToggleAdmin={() => setIsAdminMode(!isAdminMode)} isAdminMode={isAdminMode} siteConfig={displaySiteConfig} />
+
+      {/* WhatsApp Interactive Floating Widget */}
+      {!isAdminMode && <WhatsAppWidget siteConfig={displaySiteConfig} />}
+
+      {/* Floating Scroll to Top button */}
+      {!isAdminMode && <ScrollToTop />}
+
+      {/* Global Success Feedback System */}
+      {successFeedback && (
+        <>
+          <SuccessModal
+            isOpen={successFeedback.isOpen}
+            onClose={() => setSuccessFeedback(prev => prev ? { ...prev, isOpen: false } : null)}
+            type={successFeedback.type}
+            name={successFeedback.name}
+          />
+          <SuccessToast
+            isVisible={!successFeedback.isOpen}
+            onClose={() => setSuccessFeedback(null)}
+            type={successFeedback.type}
+            name={successFeedback.name}
+          />
+        </>
+      )}
     </div>
   );
 }
+

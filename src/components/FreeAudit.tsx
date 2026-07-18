@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Lead } from '../types';
 import { ShieldCheck, Search, Cpu, CheckCircle2, AlertTriangle, Play, HelpCircle, Loader } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface FreeAuditProps {
   onAddLead: (lead: Omit<Lead, 'id' | 'createdAt' | 'status'>) => void;
@@ -17,8 +18,9 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
   const [isAuditing, setIsAuditing] = useState(false);
   const [auditStep, setAuditStep] = useState(0);
   const [isDone, setIsDone] = useState(false);
+  const { language, t } = useLanguage();
 
-  const steps = [
+  const stepsBn = [
     'আপনার লিংক কানেক্ট করা হচ্ছে...',
     'মোবাইল ফ্রেন্ডলিনেস চেক করা হচ্ছে...',
     'এসইও এবং মেটা ট্যাগ এনালাইসিস চলছে...',
@@ -26,6 +28,17 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
     'নিরাপত্তা সার্টিফিকেট (SSL) ভেরিফাই করা হচ্ছে...',
     'ফ্রি অডিট রিপোর্ট প্রস্তুত করা হচ্ছে...'
   ];
+
+  const stepsEn = [
+    'Connecting to your URL channel...',
+    'Checking layout mobile friendliness...',
+    'Analyzing search keywords and metadata...',
+    'Reading page loading speed & resources...',
+    'Verifying SSL security protocols...',
+    'Structuring custom growth recommendations...'
+  ];
+
+  const steps = language === 'en' ? stepsEn : stepsBn;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -53,12 +66,18 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
               source: 'Free Audit',
               auditDetails: {
                 score: Math.floor(Math.random() * 25) + 60, // random baseline
-                issues: [
+                issues: language === 'en' ? [
+                  'Page load speed is over 2.8 seconds (Optimal is 1.5s)',
+                  'Social media meta headers are missing',
+                  'Minor structural sizing issues on mobile devices'
+                ] : [
                   'পেজ লোডিং টাইম ২.৮ সেকেন্ডের বেশি (আদর্শ মান ১.৫ সেকেন্ড)',
                   'সোশ্যাল মিডিয়া মেটা ট্যাগগুলো সঠিক নয়',
                   'মোবাইল লেআউটে কিছু সাইজিং সমস্যা রয়েছে'
                 ],
-                recommendations: 'কাস্টম ফাস্ট-লোডিং আর্কিটেকচার এবং মেটা অপ্টিমাইজেশন।'
+                recommendations: language === 'en' 
+                  ? 'We recommend custom react/vite modern architecture and tag optimizations.'
+                  : 'কাস্টম ফাস্ট-লোডিং আর্কিটেকচার এবং মেটা অপ্টিমাইজেশন।'
               }
             });
           }, 800);
@@ -88,13 +107,13 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
           {/* Left Text Grid */}
           <div className="lg:col-span-5">
             <div className="inline-flex items-center space-x-1 px-3 py-1 rounded-full bg-agency-purple/10 text-agency-purple text-xs font-semibold uppercase mb-4">
-              <span>ফ্রি সার্ভিস</span>
+              <span>{language === 'en' ? 'Free Service' : 'ফ্রি সার্ভিস'}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight font-display">
-              আপনার ব্যবসার জন্য সম্পূর্ণ ফ্রি ডিজিটাল অডিট
+              {t('audit_title')}
             </h2>
             <p className="mt-4 text-gray-400 leading-relaxed bangla-text">
-              আপনার Website অথবা Facebook Page আমরা সম্পূর্ণ ফ্রি রিভিউ করে জানিয়ে দেব কোথায় সমস্যা রয়েছে এবং কীভাবে উন্নতি করা যায়।
+              {t('audit_subtitle')}
             </p>
 
             {/* Micro Benefits list */}
@@ -104,8 +123,14 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
                   <ShieldCheck className="w-4.5 h-4.5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">সম্পূর্ণ নিরাপদ</h4>
-                  <p className="text-xs text-gray-400">আপনার কোনো পাসওয়ার্ড বা গোপন তথ্যের প্রয়োজন নেই।</p>
+                  <h4 className="text-sm font-bold text-white">
+                    {language === 'en' ? '100% Secure' : 'সম্পূর্ণ নিরাপদ'}
+                  </h4>
+                  <p className="text-xs text-gray-400">
+                    {language === 'en' 
+                      ? 'No passwords or sensitive account information required.' 
+                      : 'আপনার কোনো পাসওয়ার্ড বা গোপন তথ্যের প্রয়োজন নেই।'}
+                  </p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
@@ -113,8 +138,14 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
                   <Cpu className="w-4.5 h-4.5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">অ্যাকশনেবল রিপোর্ট</h4>
-                  <p className="text-xs text-gray-400">যে পয়েন্টগুলো ফিক্স করলে সরাসরি বিক্রি বেড়ে যাবে তা জানিয়ে দেওয়া হবে।</p>
+                  <h4 className="text-sm font-bold text-white">
+                    {language === 'en' ? 'Actionable Breakdown' : 'অ্যাকশনেবল রিপোর্ট'}
+                  </h4>
+                  <p className="text-xs text-gray-400">
+                    {language === 'en'
+                      ? 'We pinpoint direct tactical improvements that increase customer actions and sales.'
+                      : 'যে পয়েন্টগুলো ফিক্স করলে সরাসরি বিক্রি বেড়ে যাবে তা জানিয়ে দেওয়া হবে।'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -137,23 +168,27 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">আপনার নাম *</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'Your Name *' : 'আপনার নাম *'}
+                        </label>
                         <input
                           type="text"
                           required
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="উদা: সাকিব আহমেদ"
+                          placeholder={language === 'en' ? 'e.g., John Doe' : 'উদা: সাকিব আহমেদ'}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">ব্যবসার নাম</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'Business Name' : 'ব্যবসার নাম'}
+                        </label>
                         <input
                           type="text"
                           value={businessName}
                           onChange={(e) => setBusinessName(e.target.value)}
-                          placeholder="উদা: সাকিব’স কিচেন"
+                          placeholder={language === 'en' ? 'e.g., Shopify Brand' : 'উদা: সাকিব’স কিচেন'}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                         />
                       </div>
@@ -161,42 +196,50 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">মোবাইল নম্বর *</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'WhatsApp Mobile *' : 'মোবাইল নম্বর *'}
+                        </label>
                         <input
                           type="tel"
                           required
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          placeholder="উদা: 017xxxxxxxx"
+                          placeholder={language === 'en' ? 'e.g., 017xxxxxxxx' : 'উদা: 017xxxxxxxx'}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">ইমেইল</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'Email' : 'ইমেইল'}
+                        </label>
                         <input
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="উদা: sakib@gmail.com"
+                          placeholder={language === 'en' ? 'e.g., mail@example.com' : 'উদা: sakib@gmail.com'}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Website অথবা Facebook Page Link *</label>
+                      <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                        {language === 'en' ? 'Website / Page Link *' : 'Website অথবা Facebook Page Link *'}
+                      </label>
                       <input
                         type="url"
                         required
                         value={link}
                         onChange={(e) => setLink(e.target.value)}
-                        placeholder="উদা: facebook.com/yourbusiness"
+                        placeholder={language === 'en' ? 'e.g., facebook.com/shopname' : 'উদা: facebook.com/yourbusiness'}
                         className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">কোন সার্ভিস নিয়ে অডিট চান?</label>
+                      <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                        {t('audit_select_service')}
+                      </label>
                       <select
                         value={service}
                         onChange={(e) => setService(e.target.value)}
@@ -212,10 +255,10 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
                     <button
                       id="btn-submit-audit"
                       type="submit"
-                      className="w-full mt-4 py-4 rounded-xl bg-gradient-to-r from-agency-purple to-agency-pink text-white font-bold text-sm tracking-wide shadow-lg hover:shadow-agency-purple/20 transition-all flex items-center justify-center space-x-2"
+                      className="w-full mt-4 py-4 rounded-xl bg-gradient-to-r from-agency-purple to-agency-pink text-white font-bold text-sm tracking-wide shadow-lg hover:shadow-agency-purple/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                     >
                       <Search className="w-4 h-4" />
-                      <span>ফ্রি অডিট নিন</span>
+                      <span>{t('nav_get_free_audit')}</span>
                     </button>
                   </motion.form>
                 )}
@@ -235,7 +278,9 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
                         <Cpu className="w-8 h-8 animate-pulse" />
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">আপনার ডিজিটাল প্ল্যাটফর্ম এনালাইসিস করা হচ্ছে</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      {language === 'en' ? 'Analyzing Your Digital Platform...' : 'আপনার ডিজিটাল প্ল্যাটফর্ম এনালাইসিস করা হচ্ছে'}
+                    </h3>
                     <p className="text-xs text-agency-pink font-mono tracking-widest uppercase mb-4">SYSTEM SCANNING IN PROGRESS...</p>
                     
                     {/* Live step indicator */}
@@ -257,17 +302,21 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
                     <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-6">
                       <CheckCircle2 className="w-8 h-8" />
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2 font-display">অডিট সফলভাবে সাবমিট হয়েছে!</h3>
+                    <h3 className="text-2xl font-bold text-white mb-2 font-display">
+                      {language === 'en' ? 'Audit Submitted Successfully!' : 'অডিট সফলভাবে সাবমিট হয়েছে!'}
+                    </h3>
                     <p className="text-gray-300 text-sm max-w-md mx-auto mb-6 bangla-text leading-relaxed">
-                      ধন্যবাদ! আমাদের অভিজ্ঞ টিম আপনার লিংকটি পর্যালোচনা করা শুরু করেছে। আগামী ২৪ ঘণ্টার মধ্যে আপনার মোবাইল নম্বরে অথবা ইমেইলে ডিটেইলড অডিট রিপোর্ট পাঠিয়ে দেওয়া হবে।
+                      {language === 'en' 
+                        ? 'Thank you! Our expert strategy team has started reviewing your brand assets. A comprehensive feedback review will be dispatched to your phone/WhatsApp or email within 24 hours.'
+                        : 'ধন্যবাদ! আমাদের অভিজ্ঞ টিম আপনার লিংকটি পর্যালোচনা করা শুরু করেছে। আগামী ২৪ ঘণ্টার মধ্যে আপনার মোবাইল নম্বরে অথবা ইমেইলে ডিটেইলড অডিট রিপোর্ট পাঠিয়ে দেওয়া হবে।'}
                     </p>
                     
                     <button
                       id="btn-audit-reset"
                       onClick={resetForm}
-                      className="px-6 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-semibold border border-white/10 transition-all"
+                      className="px-6 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-semibold border border-white/10 transition-all cursor-pointer"
                     >
-                      আরেকটি অডিট করুন
+                      {language === 'en' ? 'Perform Another Audit' : 'আরেকটি অডিট করুন'}
                     </button>
                   </motion.div>
                 )}
@@ -281,3 +330,4 @@ export default function FreeAudit({ onAddLead }: FreeAuditProps) {
     </section>
   );
 }
+

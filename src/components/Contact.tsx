@@ -2,6 +2,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Lead, SiteConfig } from '../types';
 import { Phone, Mail, MapPin, Send, CheckCircle2, Sparkles } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ContactProps {
   selectedService: string;
@@ -19,6 +20,8 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
   const [service, setService] = useState('Website Development');
   const [message, setMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { language, t } = useLanguage();
+
 
   // Extract Helpline raw value
   const rawHelpline = siteConfig.footer.helpline || '+৮৮০ ১৭০০-০০০০০০';
@@ -58,9 +61,13 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
       } else {
         setService(selectedService);
       }
-      setMessage(`আমি আপনাদের "${selectedService}" প্যাকেজ/সার্ভিসটি সম্পর্কে বিস্তারিত জানতে আগ্রহী।`);
+      setMessage(
+        language === 'en'
+          ? `I am interested in knowing more about your "${selectedService}" package/service.`
+          : `আমি আপনাদের "${selectedService}" প্যাকেজ/সার্ভিসটি সম্পর্কে বিস্তারিত জানতে আগ্রহী।`
+      );
     }
-  }, [selectedService]);
+  }, [selectedService, language]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -105,13 +112,13 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
             viewport={{ once: true }}
             className="inline-flex items-center space-x-1 px-3 py-1 rounded-full bg-agency-purple/10 text-agency-purple text-xs font-semibold uppercase mb-3"
           >
-            <span>যোগাযোগ করুন</span>
+            <span>{language === 'en' ? 'Get In Touch' : 'যোগাযোগ করুন'}</span>
           </motion.div>
           <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-display">
-            আজই যোগাযোগ করুন
+            {t('contact_title')}
           </h2>
           <p className="mt-4 text-gray-400 text-sm sm:text-base bangla-text">
-            আপনার ব্যবসার জন্য কোন সার্ভিসটি সবচেয়ে উপযুক্ত জানতে চাইলে আমাদের সাথে যোগাযোগ করুন।
+            {t('contact_subtitle')}
           </p>
         </div>
 
@@ -124,11 +131,15 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
                 <Phone className="w-5 h-5" />
               </div>
               <div>
-                <span className="block text-xs text-gray-500 uppercase tracking-widest font-mono">মোবাইল নম্বর</span>
+                <span className="block text-xs text-gray-500 uppercase tracking-widest font-mono">
+                  {language === 'en' ? 'WhatsApp Mobile' : 'মোবাইল নম্বর'}
+                </span>
                 <a href={`tel:${englishPhoneDigits}`} className="text-white hover:text-agency-purple font-semibold text-sm sm:text-base transition-colors mt-1 block font-mono">
                   {rawHelpline}
                 </a>
-                <span className="text-[11px] text-gray-400 block mt-0.5">শনিবার - বৃহস্পতিবার (সকাল ৯:০০ - রাত ৮:০০)</span>
+                <span className="text-[11px] text-gray-400 block mt-0.5">
+                  {language === 'en' ? 'Sat - Thu (9:00 AM - 8:00 PM)' : 'শনিবার - বৃহস্পতিবার (সকাল ৯:০০ - রাত ৮:০০)'}
+                </span>
               </div>
             </div>
 
@@ -137,7 +148,9 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
                 <Mail className="w-5 h-5" />
               </div>
               <div>
-                <span className="block text-xs text-gray-500 uppercase tracking-widest font-mono">ইমেইল ঠিকানা</span>
+                <span className="block text-xs text-gray-500 uppercase tracking-widest font-mono">
+                  {language === 'en' ? 'Email Address' : 'ইমেইল ঠিকানা'}
+                </span>
                 <a href={`mailto:${supportEmail}`} className="text-white hover:text-agency-pink font-semibold text-sm sm:text-base transition-colors mt-1 block">
                   {supportEmail}
                 </a>
@@ -149,9 +162,15 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
                 <MapPin className="w-5 h-5" />
               </div>
               <div>
-                <span className="block text-xs text-gray-500 uppercase tracking-widest font-mono">প্রধান কার্যালয়</span>
+                <span className="block text-xs text-gray-500 uppercase tracking-widest font-mono">
+                  {language === 'en' ? 'Headquarters' : 'প্রধান কার্যালয়'}
+                </span>
                 <p className="text-white text-sm mt-1 bangla-text leading-relaxed">
-                  উত্তরা মডেল টাউন, সেক্টর-১১,<br />ঢাকা-১২৩০, বাংলাদেশ।
+                  {language === 'en' ? (
+                    <>Uttara Model Town, Sector-11,<br />Dhaka-1230, Bangladesh.</>
+                  ) : (
+                    <>উত্তরা মডেল টাউন, সেক্টর-১১,<br />ঢাকা-১২৩০, বাংলাদেশ।</>
+                  )}
                 </p>
               </div>
             </div>
@@ -160,7 +179,11 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
             <div className="p-6 rounded-2xl bg-gradient-to-tr from-[#111625] to-[#0a0e1a] border border-agency-purple/10 flex items-center space-x-3">
               <Sparkles className="w-5 h-5 text-agency-purple shrink-0" />
               <p className="text-xs text-gray-400 bangla-text leading-relaxed">
-                আমাদের প্রতিনিধি সাধারণত সাবমিট করার <strong className="text-white">১ ঘণ্টার মধ্যে</strong> ফোনে যোগাযোগ করে থাকেন।
+                {language === 'en' ? (
+                  <>Our representative usually connects with you on phone/WhatsApp <strong className="text-white">within 1 hour</strong>.</>
+                ) : (
+                  <>আমাদের প্রতিনিধি সাধারণত সাবমিট করার <strong className="text-white">১ ঘণ্টার মধ্যে</strong> ফোনে যোগাযোগ করে থাকেন।</>
+                )}
               </p>
             </div>
           </div>
@@ -180,23 +203,27 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">নাম *</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'Name *' : 'নাম *'}
+                        </label>
                         <input
                           type="text"
                           required
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="আপনার নাম"
+                          placeholder={language === 'en' ? 'Your Name' : 'আপনার নাম'}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">ব্যবসার নাম</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'Business Name' : 'ব্যবসার নাম'}
+                        </label>
                         <input
                           type="text"
                           value={businessName}
                           onChange={(e) => setBusinessName(e.target.value)}
-                          placeholder="আপনার ব্যবসার নাম"
+                          placeholder={language === 'en' ? 'Your Business Name' : 'আপনার ব্যবসার নাম'}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                         />
                       </div>
@@ -204,23 +231,27 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">মোবাইল নম্বর *</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'Mobile Number *' : 'মোবাইল নম্বর *'}
+                        </label>
                         <input
                           type="tel"
                           required
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          placeholder="উদা: 017xxxxxxxx"
+                          placeholder={language === 'en' ? 'e.g., 017xxxxxxxx' : 'উদা: 017xxxxxxxx'}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">ইমেইল</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'Email' : 'ইমেইল'}
+                        </label>
                         <input
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="উদা: yourname@gmail.com"
+                          placeholder={language === 'en' ? 'e.g., brand@gmail.com' : 'উদা: yourname@gmail.com'}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                         />
                       </div>
@@ -228,17 +259,21 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Website / Facebook Link</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'Website / Facebook Link' : 'Website / Facebook Link'}
+                        </label>
                         <input
                           type="text"
                           value={link}
                           onChange={(e) => setLink(e.target.value)}
-                          placeholder="ফেসবুক পেজ লিংক বা ওয়েবসাইট"
+                          placeholder={language === 'en' ? 'Facebook page link or website URL' : 'ফেসবুক পেজ লিংক বা ওয়েবসাইট'}
                           className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">কোন সার্ভিস প্রয়োজন?</label>
+                        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                          {language === 'en' ? 'Which service is needed?' : 'কোন সার্ভিস প্রয়োজন?'}
+                        </label>
                         <select
                           value={service}
                           onChange={(e) => setService(e.target.value)}
@@ -253,12 +288,14 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">বার্তা</label>
+                      <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                        {language === 'en' ? 'Message' : 'বার্তা'}
+                      </label>
                       <textarea
                         rows={4}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="আপনার ব্যবসার লক্ষ্য বা কাঙ্ক্ষিত ডিজাইন সম্পর্কে লিখুন..."
+                        placeholder={language === 'en' ? 'Briefly write your business goals or specific design requirements...' : 'আপনার ব্যবসার লক্ষ্য বা কাঙ্ক্ষিত ডিজাইন সম্পর্কে লিখুন...'}
                         className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-agency-purple resize-none"
                       />
                     </div>
@@ -266,10 +303,10 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
                     <button
                       id="btn-submit-contact"
                       type="submit"
-                      className="w-full py-4 rounded-xl bg-gradient-to-r from-agency-purple to-agency-violet text-white font-bold text-sm tracking-wide shadow-lg hover:shadow-agency-purple/25 transition-all flex items-center justify-center space-x-2 border border-white/5 hover:border-white/10"
+                      className="w-full py-4 rounded-xl bg-gradient-to-r from-agency-purple to-agency-violet text-white font-bold text-sm tracking-wide shadow-lg hover:shadow-agency-purple/25 transition-all flex items-center justify-center space-x-2 border border-white/5 hover:border-white/10 cursor-pointer"
                     >
                       <Send className="w-4 h-4 animate-bounce" />
-                      <span>সাবমিট করুন</span>
+                      <span>{language === 'en' ? 'Submit Now' : 'সাবমিট করুন'}</span>
                     </button>
                   </motion.form>
                 ) : (
@@ -283,16 +320,20 @@ export default function Contact({ selectedService, onAddLead, resetSelection, si
                     <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-6">
                       <CheckCircle2 className="w-8 h-8" />
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2 font-display">বার্তা সফলভাবে পাঠানো হয়েছে!</h3>
+                    <h3 className="text-2xl font-bold text-white mb-2 font-display">
+                      {language === 'en' ? 'Message Sent Successfully!' : 'বার্তা সফলভাবে পাঠানো হয়েছে!'}
+                    </h3>
                     <p className="text-gray-300 text-sm max-w-md mx-auto mb-6 bangla-text leading-relaxed">
-                      ধন্যবাদ! আপনার ক্যোয়ারীটি আমরা পেয়েছি। খুব শীঘ্রই B2bfiy-এর পক্ষ থেকে একজন কন্সালটেন্ট আপনার সাথে যোগাযোগ করবেন।
+                      {language === 'en' 
+                        ? 'Thank you! We have successfully received your query. A senior consultant from B2bfiy will reach out to you shortly.'
+                        : 'ধন্যবাদ! আপনার ক্যোয়ারীটি আমরা পেয়েছি। খুব শীঘ্রই B2bfiy-এর পক্ষ থেকে একজন কন্সালটেন্ট আপনার সাথে যোগাযোগ করবেন।'}
                     </p>
                     <button
                       id="btn-contact-reset"
                       onClick={handleReset}
-                      className="px-6 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-semibold border border-white/10 transition-all"
+                      className="px-6 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-semibold border border-white/10 transition-all cursor-pointer"
                     >
-                      নতুন বার্তা পাঠান
+                      {language === 'en' ? 'Send Another Message' : 'নতুন বার্তা পাঠান'}
                     </button>
                   </motion.div>
                 )}

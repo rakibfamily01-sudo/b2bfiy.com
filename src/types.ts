@@ -111,6 +111,7 @@ export interface SiteConfig {
     logoHighlightText: string;
     logoSubText: string;
     faviconUrl: string;
+    logoImageUrl?: string;
     appUrl: string;
     appTitle: string;
   };

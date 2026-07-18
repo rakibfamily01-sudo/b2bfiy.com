@@ -10,6 +10,145 @@ import {
   Star, Quote
 } from 'lucide-react';
 
+interface ImageUploadFieldProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  id?: string;
+}
+
+function ImageUploadField({ label, value, onChange, placeholder = 'https://...', id }: ImageUploadFieldProps) {
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputId = `file-upload-${id || Math.random().toString(36).substr(2, 9)}`;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    processFile(file);
+  };
+
+  const processFile = (file: File) => {
+    if (file.size > 8 * 1024 * 1024) {
+      alert("File is too large! Please select an image smaller than 8MB. (ফাইলটি অনেক বড়, দয়া করে ৮ মেগাবাইটের কম সাইজের ছবি সিলেক্ট করুন)");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        onChange(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{label}</label>
+      
+      {/* Drag & Drop Upload Zone */}
+      <div
+        className={`relative border-2 border-dashed rounded-xl p-3.5 transition-all flex flex-col items-center justify-center text-center ${
+          dragActive 
+            ? 'border-rose-500 bg-rose-500/10' 
+            : value 
+              ? 'border-white/10 bg-black/10' 
+              : 'border-white/10 hover:border-white/20 bg-black/20'
+        }`}
+        onDragEnter={handleDrag}
+        onDragOver={handleDrag}
+        onDragLeave={handleDrag}
+        onDrop={handleDrop}
+      >
+        <input
+          type="file"
+          id={fileInputId}
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+
+        {value ? (
+          <div className="flex flex-col items-center space-y-2 w-full">
+            <div className="relative group/img">
+              <img
+                src={value}
+                alt="Upload preview"
+                referrerPolicy="no-referrer"
+                className="max-h-20 max-w-full rounded-lg object-contain border border-white/10 shadow-lg"
+              />
+              <button
+                type="button"
+                onClick={() => onChange('')}
+                className="absolute -top-2 -right-2 bg-rose-600 text-white p-1 rounded-full hover:bg-rose-700 transition-colors shadow-lg shadow-black/50"
+                title="Remove image"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="text-[10px] text-gray-400 font-mono text-center w-full truncate px-4">
+              {value.startsWith('data:') ? '✓ Custom Uploaded Image' : `URL: ${value}`}
+            </div>
+          </div>
+        ) : (
+          <label
+            htmlFor={fileInputId}
+            className="flex flex-col items-center justify-center cursor-pointer w-full py-1.5 group"
+          >
+            <div className="w-7 h-7 rounded-lg bg-white/5 group-hover:bg-rose-500/10 flex items-center justify-center mb-1.5 transition-colors">
+              <Share2 className="w-3.5 h-3.5 text-gray-400 group-hover:text-rose-400" />
+            </div>
+            <p className="text-[11px] text-gray-300 font-semibold">
+              Click to Upload <span className="text-rose-400">or Drag & Drop</span>
+            </p>
+            <p className="text-[9px] text-gray-500 mt-0.5 bangla-text">
+              মোবাইল বা পিসি থেকে ছবি সিলেক্ট করুন
+            </p>
+          </label>
+        )}
+      </div>
+
+      {/* Manual Input Field (Fallback/URL option) */}
+      <div className="relative">
+        <input
+          type="text"
+          value={value.startsWith('data:') ? '' : value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={value.startsWith('data:') ? 'Base64 image is active (ছবি আপলোড করা আছে)' : placeholder}
+          className="w-full pl-3 pr-16 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-rose-500/50 transition-colors font-mono"
+        />
+        <label
+          htmlFor={fileInputId}
+          className="absolute right-1.5 top-1.5 px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 border border-white/5 text-[9px] text-gray-300 font-bold cursor-pointer transition-all uppercase tracking-wider"
+        >
+          Browse
+        </label>
+      </div>
+    </div>
+  );
+}
+
 interface AdminPanelProps {
   leads: Lead[];
   onUpdateLeadStatus: (id: string, status: Lead['status']) => void;
@@ -1096,8 +1235,8 @@ export default function AdminPanel({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                <div className="md:col-span-1">
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">App Meta Title (SEO)</label>
                   <input
                     type="text"
@@ -1114,21 +1253,42 @@ export default function AdminPanel({
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Favicon URL (32x32 Image)</label>
-                  <input
-                    type="text"
-                    value={editedConfig.branding.faviconUrl}
-                    onChange={(e) => {
+                <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
+                  <ImageUploadField
+                    label="Custom Logo Image (কাস্টম লোগো আপলোড)"
+                    value={editedConfig.branding.logoImageUrl || ''}
+                    onChange={(val) => {
                       setEditedConfig({
                         ...editedConfig,
-                        branding: { ...editedConfig.branding, faviconUrl: e.target.value }
+                        branding: { ...editedConfig.branding, logoImageUrl: val }
+                      });
+                      markDirty();
+                    }}
+                    placeholder="Pasted logo image URL or uploaded base64"
+                    id="branding-logo"
+                  />
+                  <p className="text-[10px] text-gray-500 mt-1 bangla-text">
+                    লোগো আপলোড করলে টেক্সট লোগোর পরিবর্তে ইমেজ লোগো শো করবে।
+                  </p>
+                </div>
+
+                <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
+                  <ImageUploadField
+                    label="Favicon Image (ফেভিকন আপলোড - 32x32)"
+                    value={editedConfig.branding.faviconUrl || ''}
+                    onChange={(val) => {
+                      setEditedConfig({
+                        ...editedConfig,
+                        branding: { ...editedConfig.branding, faviconUrl: val }
                       });
                       markDirty();
                     }}
                     placeholder="e.g. https://.../image.png"
-                    className="w-full p-3 rounded-xl bg-black/20 border border-white/10 text-white text-sm focus:outline-none focus:ring-1 focus:ring-agency-purple"
+                    id="branding-favicon"
                   />
+                  <p className="text-[10px] text-gray-500 mt-1 bangla-text">
+                    ব্রাউজার ট্যাবে যে ছোট্ট আইকনটি দেখায় সেটি।
+                  </p>
                 </div>
               </div>
             </div>
@@ -2977,13 +3137,12 @@ ALTER TABLE site_settings DISABLE ROW LEVEL SECURITY;`}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-1">Image URL / Cover Photo</label>
-                <input
-                  type="text"
-                  required
+                <ImageUploadField
+                  label="Image / Cover Photo (কাজের ছবি আপলোড)"
                   value={editingPortfolioItem.image}
-                  onChange={(e) => setEditingPortfolioItem({ ...editingPortfolioItem, image: e.target.value })}
-                  className="w-full p-2.5 rounded-lg bg-black/30 border border-white/10 text-white text-xs font-mono"
+                  onChange={(val) => setEditingPortfolioItem({ ...editingPortfolioItem, image: val })}
+                  placeholder="https://images.unsplash.com/photo-..."
+                  id="portfolio-item-image"
                 />
               </div>
 
@@ -3415,13 +3574,12 @@ ALTER TABLE site_settings DISABLE ROW LEVEL SECURITY;`}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-1">Logo / Avatar Image URL (লোগো বা ছবি লিংক)</label>
-                <input
-                  type="text"
+                <ImageUploadField
+                  label="Logo / Avatar Image (ক্লায়েন্ট বা ব্র্যান্ডের লোগো/ছবি)"
                   value={editingTestimonial.logoUrl || ''}
-                  onChange={(e) => setEditingTestimonial({ ...editingTestimonial, logoUrl: e.target.value })}
+                  onChange={(val) => setEditingTestimonial({ ...editingTestimonial, logoUrl: val })}
                   placeholder="https://images.unsplash.com/photo-..."
-                  className="w-full p-2.5 rounded-lg bg-black/30 border border-white/10 text-white text-xs font-mono"
+                  id="testimonial-logo"
                 />
               </div>
 

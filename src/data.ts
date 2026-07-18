@@ -10,6 +10,7 @@ export const defaultSiteConfig: SiteConfig = {
     logoHighlightText: 'fiy',
     logoSubText: 'Digital Partner',
     faviconUrl: 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=32',
+    logoImageUrl: '',
     appUrl: 'https://b2bfiy.com',
     appTitle: 'B2bfiy - Premium Digital Marketing Agency',
   },
