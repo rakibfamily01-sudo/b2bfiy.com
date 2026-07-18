@@ -280,3 +280,107 @@ ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read/write on site_settings" ON site_settings FOR ALL USING (true);
 */`;
 }
+
+export async function runSupabaseDiagnostics(): Promise<{
+  success: boolean;
+  canReadLeads: boolean;
+  canWriteLeads: boolean;
+  canReadSettings: boolean;
+  canWriteSettings: boolean;
+  urlConfigured: boolean;
+  keyConfigured: boolean;
+  clientInitialized: boolean;
+  errorLeadsRead?: string;
+  errorLeadsWrite?: string;
+  errorSettingsRead?: string;
+  errorSettingsWrite?: string;
+}> {
+  const result = {
+    success: false,
+    canReadLeads: false,
+    canWriteLeads: false,
+    canReadSettings: false,
+    canWriteSettings: false,
+    urlConfigured: !!supabaseUrl,
+    keyConfigured: !!supabaseAnonKey,
+    clientInitialized: !!supabase,
+    errorLeadsRead: undefined as string | undefined,
+    errorLeadsWrite: undefined as string | undefined,
+    errorSettingsRead: undefined as string | undefined,
+    errorSettingsWrite: undefined as string | undefined,
+  };
+
+  if (!supabase) {
+    return result;
+  }
+
+  // 1. Test Leads Read
+  try {
+    const { error } = await supabase.from('leads').select('id').limit(1);
+    if (error) {
+      result.errorLeadsRead = `${error.code}: ${error.message}`;
+    } else {
+      result.canReadLeads = true;
+    }
+  } catch (err: any) {
+    result.errorLeadsRead = err.message || String(err);
+  }
+
+  // 2. Test Leads Write & Delete
+  try {
+    const testId = 'diag_test_' + Date.now();
+    const testLead = {
+      id: testId,
+      name: 'Diagnostics Test User',
+      phone: '01700000000',
+      status: 'Pending',
+      source: 'Diagnostics',
+      created_at: new Date().toISOString()
+    };
+    const { error: writeErr } = await supabase.from('leads').insert(testLead);
+    if (writeErr) {
+      result.errorLeadsWrite = `${writeErr.code}: ${writeErr.message}`;
+    } else {
+      result.canWriteLeads = true;
+      // Cleanup immediately
+      await supabase.from('leads').delete().eq('id', testId);
+    }
+  } catch (err: any) {
+    result.errorLeadsWrite = err.message || String(err);
+  }
+
+  // 3. Test Site Settings Read
+  try {
+    const { error } = await supabase.from('site_settings').select('key').limit(1);
+    if (error) {
+      result.errorSettingsRead = `${error.code}: ${error.message}`;
+    } else {
+      result.canReadSettings = true;
+    }
+  } catch (err: any) {
+    result.errorSettingsRead = err.message || String(err);
+  }
+
+  // 4. Test Site Settings Write & Delete
+  try {
+    const testKey = 'diag_test_key_' + Date.now();
+    const { error: writeErr } = await supabase.from('site_settings').insert({
+      key: testKey,
+      value: { test: true },
+      updated_at: new Date().toISOString()
+    });
+    if (writeErr) {
+      result.errorSettingsWrite = `${writeErr.code}: ${writeErr.message}`;
+    } else {
+      result.canWriteSettings = true;
+      // Cleanup
+      await supabase.from('site_settings').delete().eq('key', testKey);
+    }
+  } catch (err: any) {
+    result.errorSettingsWrite = err.message || String(err);
+  }
+
+  result.success = result.canReadLeads && result.canWriteLeads && result.canReadSettings && result.canWriteSettings;
+  return result;
+}
+

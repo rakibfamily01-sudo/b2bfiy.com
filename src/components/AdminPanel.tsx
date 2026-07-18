@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Lead, SiteConfig, PortfolioItem, ServicePackage, ServiceItem, WhyChooseUsReason, FAQItem, TestimonialItem } from '../types';
-import { getSQLSchema } from '../lib/supabaseClient';
+import { getSQLSchema, runSupabaseDiagnostics } from '../lib/supabaseClient';
 import {
   Search, Filter, CheckCircle, FileSpreadsheet, Trash2, Phone, Mail,
   ExternalLink, MessageSquare, Sparkles, Calendar, Layers, Database,
@@ -82,6 +82,39 @@ export default function AdminPanel({
   const [editingTestimonial, setEditingTestimonial] = useState<TestimonialItem | null>(null);
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
   const [copiedSql, setCopiedSql] = useState(false);
+  
+  // Database Diagnostics state
+  const [diagLoading, setDiagLoading] = useState(false);
+  const [diagResult, setDiagResult] = useState<{
+    success: boolean;
+    canReadLeads: boolean;
+    canWriteLeads: boolean;
+    canReadSettings: boolean;
+    canWriteSettings: boolean;
+    urlConfigured: boolean;
+    keyConfigured: boolean;
+    clientInitialized: boolean;
+    errorLeadsRead?: string;
+    errorLeadsWrite?: string;
+    errorSettingsRead?: string;
+    errorSettingsWrite?: string;
+  } | null>(null);
+  const [diagRun, setDiagRun] = useState(false);
+
+  // Function to run connection test
+  const handleRunDiagnostics = async () => {
+    setDiagLoading(true);
+    setDiagResult(null);
+    setDiagRun(true);
+    try {
+      const res = await runSupabaseDiagnostics();
+      setDiagResult(res);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDiagLoading(false);
+    }
+  };
 
   // Sync edited config whenever siteConfig changes externally
   useEffect(() => {
@@ -2554,6 +2587,195 @@ export default function AdminPanel({
                   </div>
                 </div>
 
+              </div>
+
+              {/* --- DATABASE DIAGNOSTICS SECTION --- */}
+              <div className="border-t border-white/5 pt-6 mt-6 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-sm font-bold text-white flex items-center space-x-1.5">
+                      <RefreshCw className={`w-4 h-4 text-rose-500 ${diagLoading ? 'animate-spin' : ''}`} />
+                      <span>Supabase Real-Time Connection Diagnostic Tester (রিয়েল-টাইম কানেকশন টেস্ট)</span>
+                    </h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5 bangla-text">
+                      ডেটাবেজে ডেটা সেভ হতে সমস্যা হলে নিচের বাটনে ক্লিক করে নিখুঁতভাবে কানেকশন ও পারমিশন পরীক্ষা করে নিন।
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={diagLoading}
+                    onClick={handleRunDiagnostics}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-agency-pink hover:opacity-90 text-white text-xs font-bold flex items-center justify-center space-x-1.5 shadow-lg shadow-rose-500/10 cursor-pointer disabled:opacity-50 shrink-0"
+                  >
+                    {diagLoading ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Diagnosing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Database className="w-3.5 h-3.5" />
+                        <span>Run Connection Test & Diagnose</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {diagRun && diagResult && (
+                  <div className="p-5 rounded-xl bg-black/40 border border-white/10 space-y-4 animate-fadeIn">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                      <h5 className="text-xs font-bold text-white uppercase tracking-wider font-mono">DIAGNOSTIC REPORT</h5>
+                      {diagResult.success ? (
+                        <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                          ALL SYSTEMS OK 🎉
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                          ISSUES DETECTED ⚠️
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Configuration Checks */}
+                      <div className="space-y-2.5">
+                        <h6 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider font-mono">1. Env Configuration Checks</h6>
+                        
+                        {/* URL Check */}
+                        <div className="flex items-center justify-between p-2.5 rounded bg-white/[0.02] border border-white/5 text-xs">
+                          <span className="text-gray-300">URL Environment Key (`VITE_SUPABASE_URL`)</span>
+                          {diagResult.urlConfigured ? (
+                            <span className="text-emerald-400 font-semibold flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Configured</span>
+                          ) : (
+                            <span className="text-rose-400 font-semibold flex items-center"><AlertCircle className="w-3.5 h-3.5 mr-1" /> Missing</span>
+                          )}
+                        </div>
+
+                        {/* ANON Key Check */}
+                        <div className="flex items-center justify-between p-2.5 rounded bg-white/[0.02] border border-white/5 text-xs">
+                          <span className="text-gray-300">ANON Key (`VITE_SUPABASE_ANON_KEY`)</span>
+                          {diagResult.keyConfigured ? (
+                            <span className="text-emerald-400 font-semibold flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Configured</span>
+                          ) : (
+                            <span className="text-rose-400 font-semibold flex items-center"><AlertCircle className="w-3.5 h-3.5 mr-1" /> Missing</span>
+                          )}
+                        </div>
+
+                        {/* Client Connection status */}
+                        <div className="flex items-center justify-between p-2.5 rounded bg-white/[0.02] border border-white/5 text-xs">
+                          <span className="text-gray-300">Supabase JS Client Initialization</span>
+                          {diagResult.clientInitialized ? (
+                            <span className="text-emerald-400 font-semibold flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Initialized</span>
+                          ) : (
+                            <span className="text-rose-400 font-semibold flex items-center"><AlertCircle className="w-3.5 h-3.5 mr-1" /> Failed</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Operation Checks */}
+                      <div className="space-y-2.5">
+                        <h6 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider font-mono">2. Database Table Access Checks</h6>
+
+                        {/* Leads Read Check */}
+                        <div className="flex items-center justify-between p-2.5 rounded bg-white/[0.02] border border-white/5 text-xs">
+                          <span className="text-gray-300">Read `leads` table</span>
+                          {diagResult.canReadLeads ? (
+                            <span className="text-emerald-400 font-semibold flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Accessible</span>
+                          ) : (
+                            <span className="text-rose-400 font-semibold flex items-center"><AlertCircle className="w-3.5 h-3.5 mr-1" /> Blocked</span>
+                          )}
+                        </div>
+
+                        {/* Leads Write/RLS Check */}
+                        <div className="flex items-center justify-between p-2.5 rounded bg-white/[0.02] border border-white/5 text-xs">
+                          <span className="text-gray-300">Write/Insert into `leads` (RLS test)</span>
+                          {diagResult.canWriteLeads ? (
+                            <span className="text-emerald-400 font-semibold flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Successful</span>
+                          ) : (
+                            <span className="text-rose-400 font-semibold flex items-center"><AlertCircle className="w-3.5 h-3.5 mr-1" /> Failed / RLS Blocked</span>
+                          )}
+                        </div>
+
+                        {/* Site Settings Read Check */}
+                        <div className="flex items-center justify-between p-2.5 rounded bg-white/[0.02] border border-white/5 text-xs">
+                          <span className="text-gray-300">Read `site_settings` table</span>
+                          {diagResult.canReadSettings ? (
+                            <span className="text-emerald-400 font-semibold flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Accessible</span>
+                          ) : (
+                            <span className="text-rose-400 font-semibold flex items-center"><AlertCircle className="w-3.5 h-3.5 mr-1" /> Blocked</span>
+                          )}
+                        </div>
+
+                        {/* Site Settings Write Check */}
+                        <div className="flex items-center justify-between p-2.5 rounded bg-white/[0.02] border border-white/5 text-xs">
+                          <span className="text-gray-300">Write/Insert into `site_settings`</span>
+                          {diagResult.canWriteSettings ? (
+                            <span className="text-emerald-400 font-semibold flex items-center"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Successful</span>
+                          ) : (
+                            <span className="text-rose-400 font-semibold flex items-center"><AlertCircle className="w-3.5 h-3.5 mr-1" /> Failed / RLS Blocked</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Detailed Errors & Solutions Section */}
+                    {(!diagResult.success || !diagResult.clientInitialized) && (
+                      <div className="p-4 rounded-lg bg-rose-500/5 border border-rose-500/10 space-y-3.5 text-xs leading-relaxed text-gray-300">
+                        <div className="font-bold text-rose-400 flex items-center space-x-1">
+                          <ShieldAlert className="w-4 h-4 text-rose-400" />
+                          <span>ত্রুটি এবং সমাধান গাইড (Troubleshooting Solutions)</span>
+                        </div>
+                        
+                        {/* Error 1: Missing Env variables */}
+                        {(!diagResult.urlConfigured || !diagResult.keyConfigured) && (
+                          <div className="space-y-1.5">
+                            <p className="font-bold text-white bangla-text">• এনভায়রনমেন্ট ভেরিয়েবল সেট করা হয়নি:</p>
+                            <p className="pl-3 bangla-text text-gray-400">
+                              সমাধান: Vercel ড্যাশবোর্ডে আপনার প্রোজেক্টের <strong>Settings {`->`} Environment Variables</strong> সেকশনে যান। সেখানে <code>VITE_SUPABASE_URL</code> এবং <code>VITE_SUPABASE_ANON_KEY</code> কী-দ্বয় যুক্ত করুন এবং পুনরায় Deploy করুন।
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Error 2: Table does not exist */}
+                        {(diagResult.errorLeadsRead?.includes('42P01') || diagResult.errorSettingsRead?.includes('42P01')) && (
+                          <div className="space-y-1.5">
+                            <p className="font-bold text-white bangla-text">• ডেটাবেজ টেবিল খুঁজে পাওয়া যায়নি (Table Not Found):</p>
+                            <p className="pl-3 bangla-text text-gray-400">
+                              সমাধান: আপনি Supabase-এ টেবিলগুলো তৈরি করেননি। ডান পাশের <strong>Copy SQL Script</strong> বাটনে ক্লিক করে স্ক্রিপ্টটি কপি করুন। এরপর Supabase-এর <strong>SQL Editor</strong>-এ গিয়ে রান করান।
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Error 3: Row Level Security block */}
+                        {((diagResult.errorLeadsWrite && (diagResult.errorLeadsWrite.includes('42501') || diagResult.errorLeadsWrite.toLowerCase().includes('security') || diagResult.errorLeadsWrite.toLowerCase().includes('policy'))) ||
+                          (diagResult.errorSettingsWrite && (diagResult.errorSettingsWrite.includes('42501') || diagResult.errorSettingsWrite.toLowerCase().includes('security') || diagResult.errorSettingsWrite.toLowerCase().includes('policy')))) && (
+                          <div className="space-y-1.5">
+                            <p className="font-bold text-white bangla-text">• রো লেভেল সিকিউরিটি বা অনুমতি বাধা (RLS Policy Blocked):</p>
+                            <p className="pl-3 bangla-text text-gray-400">
+                              সমাধান: Supabase-এ আপনার টেবিলের <strong>Row Level Security (RLS)</strong> অন করা আছে কিন্তু পাবলিকলি ডেটা লেখার কোনো অনুমতি (Policy) দেওয়া নেই। সমাধান করতে Supabase SQL Editor-এ নিচের দুটি লাইন রান করুন:
+                            </p>
+                            <pre className="p-2.5 rounded bg-black/60 border border-white/5 font-mono text-[11px] text-amber-400 pl-4 select-all">
+{`ALTER TABLE leads DISABLE ROW LEVEL SECURITY;
+ALTER TABLE site_settings DISABLE ROW LEVEL SECURITY;`}
+                            </pre>
+                          </div>
+                        )}
+
+                        {/* General API error info */}
+                        {(diagResult.errorLeadsRead || diagResult.errorLeadsWrite || diagResult.errorSettingsRead || diagResult.errorSettingsWrite) && (
+                          <div className="mt-2 pt-2.5 border-t border-white/5 space-y-1">
+                            <p className="font-bold text-white font-mono uppercase tracking-wider text-[10px]">Raw API Error Messages:</p>
+                            {diagResult.errorLeadsRead && <div className="font-mono text-[11px] text-rose-400 pl-2">• Leads Read Error: {diagResult.errorLeadsRead}</div>}
+                            {diagResult.errorLeadsWrite && <div className="font-mono text-[11px] text-rose-400 pl-2">• Leads Write Error: {diagResult.errorLeadsWrite}</div>}
+                            {diagResult.errorSettingsRead && <div className="font-mono text-[11px] text-rose-400 pl-2">• Settings Read Error: {diagResult.errorSettingsRead}</div>}
+                            {diagResult.errorSettingsWrite && <div className="font-mono text-[11px] text-rose-400 pl-2">• Settings Write Error: {diagResult.errorSettingsWrite}</div>}
+                          </div>
+                        )}
+
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
             </div>
