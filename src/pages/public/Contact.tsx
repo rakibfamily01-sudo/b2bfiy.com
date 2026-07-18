@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '../../components/Layout';
-import { useApp } from '../../components/AppContext';
+import { useApp, apiFetch } from '../../components/AppContext';
 import { MapPin, Phone, Mail, Clock, Send, MessageCircle } from 'lucide-react';
 
 export default function Contact() {
@@ -29,7 +29,7 @@ export default function Contact() {
 
     try {
       setLoading(true);
-      const res = await fetch('/api/public/contact', {
+      const res = await apiFetch('/api/public/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)

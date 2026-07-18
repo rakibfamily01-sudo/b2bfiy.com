@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../components/AppContext';
+import { useApp, apiFetch as fetch } from '../../components/AppContext';
 import { 
   LayoutDashboard, Globe, Briefcase, Award, CreditCard, 
   Inbox, Image, Shield, LogOut, CheckCircle, AlertCircle, 
@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const { data, token, adminEmail, logout, refreshData, showToast, toast } = useApp();
+  const { data, token, adminEmail, logout, refreshData, showToast, toast, isSandboxActive } = useApp();
   
   // Tab Management
   const [activeTab, setActiveTab] = useState<'overview' | 'settings' | 'services' | 'portfolio' | 'packages' | 'leads' | 'media' | 'account'>('overview');
@@ -766,6 +766,30 @@ export default function Dashboard() {
       {/* Main Content Pane */}
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full flex flex-col gap-6 selection:bg-brand-primary selection:text-brand-pure-white">
         
+        {/* Sandbox Active Banner */}
+        {isSandboxActive && (
+          <div className="bg-amber-50/80 border border-amber-200/60 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-fade-in">
+            <div className="flex gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                <Info className="w-5 h-5 animate-pulse" />
+              </div>
+              <div>
+                <h4 className="font-extrabold text-amber-900 text-[13px] tracking-tight">IFrame Sandbox Mode Active</h4>
+                <p className="text-amber-800 text-[11px] leading-relaxed mt-0.5 max-w-2xl">
+                  Third-party cookies are restricted inside this iframe sandbox. Additions, edits, or deletions are being saved instantly to your browser's **Local Storage**. To persist settings permanently to the cloud server database, click **Open in New Tab** to manage your site on its direct domain.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => window.open(window.location.origin + '/admin', '_blank')}
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-brand-pure-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all shrink-0 flex items-center gap-1.5 cursor-pointer text-[11px]"
+            >
+              <span>Open in New Tab</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Dynamic Section Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-brand-border pb-5">
           <div>

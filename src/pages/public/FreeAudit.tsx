@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '../../components/Layout';
-import { useApp } from '../../components/AppContext';
+import { useApp, apiFetch } from '../../components/AppContext';
 import { CheckCircle2, ArrowRight, Sparkles, HelpCircle, ShieldAlert } from 'lucide-react';
 
 export default function FreeAudit() {
@@ -31,7 +31,7 @@ export default function FreeAudit() {
 
     try {
       setLoading(true);
-      const res = await fetch('/api/public/audit-request', {
+      const res = await apiFetch('/api/public/audit-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)

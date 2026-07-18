@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../components/AppContext';
+import { useApp, apiFetch } from '../../components/AppContext';
 import Layout from '../../components/Layout';
 import { 
   Laptop, Palette, Video, Share2, Award, Users, Calendar, CheckCircle, 
@@ -66,7 +66,7 @@ export default function Home() {
 
     try {
       setAuditLoading(true);
-      const res = await fetch('/api/public/audit-request', {
+      const res = await apiFetch('/api/public/audit-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(auditForm)

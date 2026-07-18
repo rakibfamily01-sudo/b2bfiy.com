@@ -1,6 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../components/AppContext';
-import { User, Lock, Eye, EyeOff, ShieldCheck, Database, AlertTriangle, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useApp, apiFetch } from '../../components/AppContext';
+import { User, Lock, Eye, EyeOff, ShieldCheck, Database, AlertTriangle, ArrowRight, CheckCircle2, Copy, Check, FileCode } from 'lucide-react';
+
+const SUPABASE_SQL_SCRIPT = `-- Supabase Table Setup Script for B2bfiy CMS
+-- Copy and run this script in the SQL Editor of your Supabase Dashboard
+
+CREATE TABLE IF NOT EXISTS site_settings (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS navigation_items (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS hero_content (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS statistics (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS client_logos (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS services (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS why_choose_us (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS portfolio_categories (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS portfolio_projects (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS work_process (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS packages (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS testimonials (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS faqs (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS audit_requests (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS contact_messages (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS media (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+CREATE TABLE IF NOT EXISTS admin_profile (id bigint PRIMARY KEY DEFAULT 1, data jsonb, updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()));
+
+ALTER TABLE site_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE navigation_items DISABLE ROW LEVEL SECURITY;
+ALTER TABLE hero_content DISABLE ROW LEVEL SECURITY;
+ALTER TABLE statistics DISABLE ROW LEVEL SECURITY;
+ALTER TABLE client_logos DISABLE ROW LEVEL SECURITY;
+ALTER TABLE services DISABLE ROW LEVEL SECURITY;
+ALTER TABLE why_choose_us DISABLE ROW LEVEL SECURITY;
+ALTER TABLE portfolio_categories DISABLE ROW LEVEL SECURITY;
+ALTER TABLE portfolio_projects DISABLE ROW LEVEL SECURITY;
+ALTER TABLE work_process DISABLE ROW LEVEL SECURITY;
+ALTER TABLE packages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE testimonials DISABLE ROW LEVEL SECURITY;
+ALTER TABLE faqs DISABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_requests DISABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE media DISABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_profile DISABLE ROW LEVEL SECURITY;`;
 
 export default function Login() {
   const { login, showToast, navigateTo, isAdminVerified, toast } = useApp();
@@ -9,6 +48,18 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dbStatus, setDbStatus] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopySql = () => {
+    try {
+      navigator.clipboard.writeText(SUPABASE_SQL_SCRIPT);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+      showToast('Supabase SQL Setup script successfully copied!', 'success');
+    } catch (e) {
+      showToast('Failed to copy. Please copy from /SUPABASE_SETUP.sql', 'error');
+    }
+  };
 
   // If already logged in, go straight to admin dashboard
   useEffect(() => {
@@ -21,7 +72,7 @@ export default function Login() {
   useEffect(() => {
     const fetchDbStatus = async () => {
       try {
-        const res = await fetch('/api/auth/db-status');
+        const res = await apiFetch('/api/auth/db-status');
         if (res.ok) {
           const data = await res.json();
           setDbStatus(data);
@@ -45,7 +96,7 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const res = await fetch('/api/auth/login', {
+      const res = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,6 +110,9 @@ export default function Login() {
         data = JSON.parse(text);
       } catch (parseErr) {
         console.error('Failed to parse response as JSON. Raw body:', text);
+        if (text.includes('__cookie_check') || text.includes('<html>') || text.includes('302 Found')) {
+          throw new Error('Third-party cookies are blocked in this iframe. Please click the "Open in new tab" icon (top-right of the preview window) or open this page directly in a new tab to log in successfully!');
+        }
         if (res.status >= 500) {
           throw new Error(`The server is currently booting up or restarting (Status ${res.status}). Please try again in 5-10 seconds!`);
         }
@@ -88,7 +142,7 @@ export default function Login() {
       setEmail('b2bfiy');
       setPassword('rakib1122@#');
       
-      const res = await fetch('/api/auth/login', {
+      const res = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,6 +155,9 @@ export default function Login() {
       try {
         data = JSON.parse(text);
       } catch (parseErr) {
+        if (text.includes('__cookie_check') || text.includes('<html>') || text.includes('302 Found')) {
+          throw new Error('Third-party cookies are blocked in this iframe. Please click the "Open in new tab" icon (top-right of the preview window) or open this page directly in a new tab to log in successfully!');
+        }
         if (res.status >= 500) {
           throw new Error('Server is currently booting up. Please try again in 5 seconds!');
         }
@@ -284,6 +341,42 @@ export default function Login() {
                 </div>
               </div>
 
+              {/* Error warning and SQL script copy button */}
+              {dbStatus?.supabaseEnabled && dbStatus?.lastCloudError && (
+                <div className="bg-red-50 p-4 rounded-2xl border border-red-100 flex flex-col gap-3 text-red-900 text-xs animate-pulse">
+                  <div className="flex gap-2.5">
+                    <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                    <div>
+                      <h5 className="font-extrabold text-[11px] text-red-900">Supabase Tables Missing!</h5>
+                      <p className="text-[10px] text-red-700 leading-normal mt-1">
+                        You have connected Supabase, but the 17 required tables do not exist or are empty in your database. 
+                        <strong> Run the SQL script below in your Supabase SQL Editor</strong> to fix this instantly:
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCopySql}
+                    className="w-full py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer active:scale-[0.98]"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>✓ SETUP SQL COPIED!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        <span>📋 COPY SUPABASE SQL SETUP</span>
+                      </>
+                    )}
+                  </button>
+                  <span className="text-[9px] text-red-500 text-center block">
+                    (Paste in Supabase &gt; SQL Editor &gt; Run)
+                  </span>
+                </div>
+              )}
+
               {/* Storage Warning */}
               <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 flex gap-3 text-amber-900 text-xs">
                 <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
@@ -294,6 +387,27 @@ export default function Login() {
                   </p>
                 </div>
               </div>
+
+              {/* Handy always available button to copy SQL */}
+              {dbStatus?.supabaseEnabled && !dbStatus?.lastCloudError && (
+                <button
+                  type="button"
+                  onClick={handleCopySql}
+                  className="w-full py-2.5 px-4 bg-brand-warm-bg text-brand-dark hover:bg-brand-border/40 border border-brand-border rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer active:scale-[0.98]"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 text-green-600" />
+                      <span className="text-green-600">✓ SQL SETUP COPIED</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileCode className="w-4 h-4 text-brand-primary" />
+                      <span>GET DATABASE SQL SETUP</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
