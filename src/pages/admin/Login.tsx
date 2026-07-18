@@ -82,6 +82,48 @@ export default function Login() {
     }
   };
 
+  const handleAutoLogin = async () => {
+    try {
+      setLoading(true);
+      setEmail('b2bfiy');
+      setPassword('rakib1122@#');
+      
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: 'b2bfiy', password: 'rakib1122@#' }),
+      });
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        if (res.status >= 500) {
+          throw new Error('Server is currently booting up. Please try again in 5 seconds!');
+        }
+        throw new Error('Invalid response from server.');
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to authenticate.');
+      }
+
+      if (data.success && data.token) {
+        login(data.token, data.email);
+        navigateTo('/admin');
+      } else {
+        throw new Error('Incomplete response payload.');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Auto-login failed.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-brand-warm-bg flex flex-col items-center justify-center p-6 md:p-12 selection:bg-brand-primary selection:text-brand-pure-white">
       {/* Toast Notifier */}
@@ -172,6 +214,16 @@ export default function Login() {
               >
                 {loading ? 'Verifying Session...' : 'ENTER DASHBOARD'}
                 <ArrowRight className="w-4 h-4" />
+              </button>
+
+              {/* One-Click Auto-Login Button */}
+              <button
+                type="button"
+                onClick={handleAutoLogin}
+                disabled={loading}
+                className="w-full py-3 px-6 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <span>⚡ ONE-CLICK AUTO LOGIN</span>
               </button>
             </form>
           </div>

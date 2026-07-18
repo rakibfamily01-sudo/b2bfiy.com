@@ -835,7 +835,7 @@
   ],
   "admin": {
     "email": "b2bfiy",
-    "passwordHash": "3449bfbbe69244daadc66a4f74a5bc355970b62868e3490473c4d9f2d6c7a19c5fb7cb9b00ce31814cf5f824984a5ef1be343891fb9ebc4ca8ef9d479d7010e5",
-    "salt": "279a1641b68eef0fca23896ab0a9ef35"
+    "passwordHash": "312024b81c0577c3fd6fc70edf213dd0c660305333267211dfb15b9ad5c228190cf31565766cd3fb88e98f3382521061c3de2bf22ee8fdd2b18a3b5c283dcc0b",
+    "salt": "284ce6b0f4a02643435fd31d2c7e3b36"
   }
 }
