@@ -1,215 +1,170 @@
-/**
- * B2bfiy Type Definitions
- */
-
-export interface SiteSettings {
+export interface Lead {
+  id: string;
   name: string;
-  logo: string;
-  logoText?: string;
-  logoDisplayType?: 'logo' | 'text' | 'both';
-  favicon: string;
+  businessName: string;
   phone: string;
   email: string;
-  whatsapp: string;
-  address: string;
-  facebook: string;
-  instagram: string;
-  linkedin: string;
-  youtube: string;
-  defaultSeoTitle: string;
-  defaultMetaDescription: string;
-  googleAnalyticsId: string;
-  facebookPixelId: string;
-  enableTopBar: boolean;
-  enableStickyHeader: boolean;
-  viewAllGraphicsDesignUrl?: string;
-  footerDescription?: string;
-  footerCopyright?: string;
+  websiteOrPage: string;
+  serviceNeeded: string;
+  message: string;
+  status: 'Pending' | 'Contacted' | 'In Progress' | 'Completed';
+  createdAt: string;
+  adminNotes?: string;
+  source: 'Contact Form' | 'Free Audit' | 'Consultation';
+  auditDetails?: {
+    score?: number;
+    issues?: string[];
+    recommendations?: string;
+  };
 }
 
-export interface NavigationItem {
-  id: string;
-  label: string;
-  url: string;
-  order: number;
-}
-
-export interface HeroContent {
-  badge: string;
-  heading: string;
-  highlightText: string;
-  description: string;
-  primaryCtaText: string;
-  primaryCtaUrl: string;
-  secondaryCtaText: string;
-  secondaryCtaUrl: string;
-  trustText: string;
-  imagePath: string;
-  isVisible: boolean;
-}
-
-export interface StatisticCard {
-  id: string;
-  label: string;
-  value: string;
-  iconName: string;
-  order: number;
-}
-
-export interface ClientLogo {
-  id: string;
-  name: string;
-  url: string;
-  imagePath: string;
-  order: number;
-  published: boolean;
-}
-
-export interface ServiceCard {
+export interface PortfolioItem {
   id: string;
   title: string;
+  category: 'Website Development' | 'Graphic Design' | 'Video Editing' | 'Facebook Management';
+  image: string;
   description: string;
-  features: string[];
-  iconName: string;
-  order: number;
-  published: boolean;
-}
-
-export interface WhyChooseUsItem {
-  id: string;
-  title: string;
-  description: string;
-  iconName: string;
-  order: number;
-}
-
-export interface PortfolioCategory {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-export interface PortfolioProject {
-  id: string;
-  slug: string;
-  title: string;
-  clientName: string;
-  categoryId: string;
-  serviceType: string;
-  thumbnail: string;
-  images: string[];
-  videoUrl: string;
-  websiteUrl: string;
-  date: string;
-  description: string;
-  challenge: string;
-  solution: string;
-  process: string;
-  result: string;
   technologies: string[];
-  tags: string[];
-  featured: boolean;
-  published: boolean;
+  clientName: string;
+  videoLink?: string;
 }
 
-export interface WorkProcessStep {
+export interface ServicePackage {
   id: string;
-  stepNumber: string;
+  name: string;
+  price: string;
+  billing: string;
+  features: string[];
+  isPopular?: boolean;
+  category: 'Website Development' | 'Graphic Design' | 'Video Editing' | 'Facebook Management';
+}
+
+export interface ServiceItem {
+  id: string;
   title: string;
   description: string;
-  order: number;
-  published: boolean;
+  iconName: string;
+  color: string;
+  bullets: string[];
 }
 
-export interface PricingPackage {
+export interface WhyChooseUsReason {
   id: string;
-  name: string;
-  type: 'monthly' | 'website' | 'graphic' | 'video' | 'bundle';
-  price: string;
-  currency: string;
-  period: string; // e.g., "Month" or "One-time"
-  features: string[];
-  mostPopular: boolean;
-  order: number;
-  deliveryTime?: string;
-  published: boolean;
-}
-
-export interface Testimonial {
-  id: string;
-  name: string;
-  company: string;
-  review: string;
-  rating: number;
-  photoPath: string;
-  order: number;
-  published: boolean;
+  title: string;
+  description: string;
+  iconName: string;
 }
 
 export interface FAQItem {
-  id: string;
   question: string;
   answer: string;
-  order: number;
-  published: boolean;
+  _index?: number;
 }
 
-export interface AuditRequest {
+export interface TestimonialItem {
   id: string;
-  fullName: string;
+  clientName: string;
   businessName: string;
-  email: string;
-  whatsapp: string;
-  websiteUrl: string;
-  serviceNeeded: string;
-  message: string;
-  status: 'new' | 'contacted' | 'qualified' | 'meeting' | 'client' | 'closed';
-  notes: string;
-  createdAt: string;
+  logoUrl: string;
+  feedback: string;
+  rating: number;
 }
 
-export interface ContactMessage {
+export interface TestimonialsSection {
+  badge: string;
+  heading: string;
+  description: string;
+  items: TestimonialItem[];
+}
+
+export interface FrictionPoint {
   id: string;
-  fullName: string;
-  email: string;
-  subject: string;
-  message: string;
-  status: 'unread' | 'read' | 'archived';
-  notes: string;
-  createdAt: string;
+  title: string;
+  description: string;
 }
 
-export interface MediaItem {
+export interface CurePoint {
   id: string;
-  fileName: string;
-  fileUrl: string;
-  fileSize: number;
-  mimeType: string;
-  uploadedAt: string;
+  text: string;
 }
 
-export interface AdminProfile {
-  email: string;
-  passwordHash: string;
-  salt: string;
+export interface FrictionAndCureSection {
+  badgeFriction: string;
+  titleFriction: string;
+  descriptionFriction: string;
+  frictionPoints: FrictionPoint[];
+  
+  badgeCure: string;
+  titleCure: string;
+  descriptionCure: string;
+  curePoints: CurePoint[];
+  ctaText: string;
 }
 
-export interface DatabaseState {
-  settings: SiteSettings;
-  navigation_items: NavigationItem[];
-  hero_content: HeroContent;
-  statistics: StatisticCard[];
-  client_logos: ClientLogo[];
-  services: ServiceCard[];
-  why_choose_us: WhyChooseUsItem[];
-  portfolio_categories: PortfolioCategory[];
-  portfolio_projects: PortfolioProject[];
-  work_process: WorkProcessStep[];
-  packages: PricingPackage[];
-  testimonials: Testimonial[];
+export interface SiteConfig {
+  adminCredentials: {
+    username: string;
+    passwordHash: string;
+  };
+  branding: {
+    logoText: string;
+    logoHighlightText: string;
+    logoSubText: string;
+    faviconUrl: string;
+    appUrl: string;
+    appTitle: string;
+  };
+  hero: {
+    badgeText: string;
+    heading: string;
+    highlight: string;
+    description: string;
+    primaryCtaText: string;
+    secondaryCtaText: string;
+    stats: {
+      projectsCount: string;
+      projectsLabel: string;
+      clientsCount: string;
+      clientsLabel: string;
+      deliveryRate: string;
+      deliveryLabel: string;
+      supportHours: string;
+      supportLabel: string;
+    };
+  };
+  frictionAndCure: FrictionAndCureSection;
+  whyChooseUs: {
+    badge: string;
+    heading: string;
+    description: string;
+    reasons: WhyChooseUsReason[];
+  };
+  services: {
+    badge: string;
+    heading: string;
+    list: ServiceItem[];
+  };
+  portfolio: {
+    badge: string;
+    heading: string;
+    description: string;
+    items: PortfolioItem[];
+  };
+  packages: {
+    badge: string;
+    heading: string;
+    description: string;
+    items: ServicePackage[];
+  };
+  testimonials: TestimonialsSection;
+  footer: {
+    aboutText: string;
+    facebookUrl: string;
+    instagramUrl: string;
+    linkedinUrl: string;
+    helpline: string;
+    email: string;
+    copyrightText: string;
+  };
   faqs: FAQItem[];
-  audit_requests: AuditRequest[];
-  contact_messages: ContactMessage[];
-  media: MediaItem[];
-  admin: AdminProfile;
 }
